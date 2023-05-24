@@ -1,26 +1,26 @@
 ## アプリ概要
 * **タイトル**  
-：マルチダメージ計算機
+マルチダメージ計算機
 * **機能**  
-：ポケットモンスターのダメージシミュレーションを行うアプリ
+ポケットモンスターのダメージシミュレーションを行うアプリ
 * **公開URL**  
-：https://pokedesiaf.com/mdmc/
+https://pokedesiaf.com/mdmc/
 * **アプリ紹介ページ**  
-：https://pokedesiaf.com/damage-calculatorm/ 
+https://pokedesiaf.com/damage-calculatorm/ 
 * **公開環境**  
-：レンタルサーバーにてWordpressサイトの固定ページとして公開
+レンタルサーバーにてWordpressサイトの固定ページとして公開
 
 ## ファイル内容
 * **frontScript.js**  
-：入力受付・操作補助・計算・結果表示を行うJavascriptファイル
+入力受付・操作補助・計算・結果表示を行うJavascriptファイル
 * **appPage.php(private)**  
-：アプリページを動的出力するPHPファイル
+アプリページを動的出力するPHPファイル
 * **appPage.html**  
-：アプリを表示するHTMLファイル（主にPHPファイルの出力結果を使用し、参考のため公開）
+アプリを表示するHTMLファイル（主にPHPファイルの出力結果を使用し、参考のため公開）
 * **design.css**  
-：appPageの出力に用いるスタイルシート
+appPageの出力に用いるスタイルシート
 * **return-mdmc.php(private)**  
-：ポケモンのステータスデータをHTTP POSTで返す
+ポケモンのステータスデータをHTTP POSTで返す
 
 データベースの参照を行うPHPファイルは現在非公開にしています。
 
