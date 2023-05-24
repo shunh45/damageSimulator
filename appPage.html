@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- ヘッダ情報はPHPからの出力時にWordPressの関数を用いて動的出力 -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マルチダメージ計算機</title>
+    </script>
+</head>
+<body>
+    <link rel="stylesheet" href="design.css">
+<!--    <link href="style.css" rel="stylesheet">-->
+<div>
+    <a href="#sidemenu" class="hamburger-menu">
+      <div></div>
+      <div></div>
+      <div></div>
+    </a>
+    <header id="sidemenu" class="sidenavs">
+        <a href="#" class="close-btn">&times;</a>
+        <a href="https://pokedesiaf.com/mdmc?Mode=A" class="side_alink">全ポケモン版</a>
+        <a href="https://pokedesiaf.com/" class="side_alink">ブログトップ</a>
+        <a href="https://twitter.com/sunkpoke" class="side_alink">制作者Twitter</a>
+        <a href="https://pokedesiaf.com/damage-calculatorM" class="side_alink">使い方：</a>
+        <div class="ppComment">加算形式で複数回の攻撃に対するダメージ計算ができるアプリです<br>➀物理・特殊・両面から分類を選択<br>➁ポケモンのデータを入力<br>➂＋ボタンで技を追加<br>➃威力の設定し、⊞ボタンから火力補正を設定</div>
+    </header>
+</div>
+<div id="MDMC_head">
+    <h1>マルチダメージ計算機 <span style="font-size:60%">ぽよもんぶろぐ！</span></h1>
+</div>
+<div class="MDMC_FRbox">
+    <div id="MDMC_fixedResult0" class="MDMC_FRline">
+        <div class="MDMC_FRleft">
+            <div class="MDMC_FRrow">
+                <div id="MDMC_FRber0" class="MDMC_FRber" style="background:#78bb58"></div>
+            </div>
+            <div class="MDMC_FRrow">
+                <div id="MDMC_FR0">0%～0%：0% (0%)</div>
+                <div class="MDMC_FREF">使用努力値　攻：<span id="MDMC_FREF0a">252</span> 受：<span id="MDMC_FREF0b">0</span></div>
+            </div>
+        </div>
+        <div class="MDMC_FRright">
+            <input type="button" class="MDMC_FRbutton" value="memo▼" onclick="MDMC.resultMemo();">
+        </div>
+    </div>
+    <div id="MDMC_fixedResult1" class="MDMC_FRline" style="display:none;">
+        <div class="MDMC_FRleft">
+            <div class="MDMC_FRrow">
+                <div id="MDMC_FRber1" class="MDMC_FRber" style="background:#78bb58"></div>
+            </div>
+            <div class="MDMC_FRrow">
+                <div id="MDMC_FR1">0%～0%：0% (0%)</div>
+                <div class="MDMC_FREF">使用努力値　攻：<span id="MDMC_FREF1a">252</span> 受：<span id="MDMC_FREF1b">0</span></div>
+            </div>
+        </div>
+        <div class="MDMC_FRright">
+            <input type="button" class="MDMC_FRbutton" value="CLOSE" onclick="MDMC.closeMemo();">
+        </div>
+    </div>
+</div>
+<div class="MDMC_main">
+<div id ="MDMC_ttBox" class="MDMC_column MDMC_column_l">
+    <div class="MDMC_catTop">
+        <input type="button" class="MDMC_inbutton_cat" id="dm_button_cat_a" value="物理" style="width:50%; border-color:#ff0000;" onclick="MDMC.dmPushCatTop(0);">
+        <input type="button" class="MDMC_inbutton_cat" id="dm_button_cat_c" value="両面" style="width:50%; border-color:#ddd;" onclick="MDMC.dmPushCatTop(2);">
+        <input type="button" class="MDMC_inbutton_cat" id="dm_button_cat_b" value="特殊" style="width:50%; border-color:#ddd;" onclick="MDMC.dmPushCatTop(1);">
+    </div>
+    <div class="MDMC_box MDMC_boxR" id="MDMC_tt0" style="display:none;">
+        <div class="MDMC_boxR_L">1</div>
+        <div class="MDMC_boxR_R" id="MDMC_ttCR0">
+            <div class="MDMC_poke_row">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:25%;">威力</div>
+                    <input autocomplete="off" class="MDMC_input" id="dm_in_10_20" type="search" value="80" style="width:45%;" oninput="MDMC.dmInput(10,20);" onchange="MDMC.finishSelect(10,20);"/>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM0(10,1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM0(10,-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                    <input type="button" class="MDMC_inbuttonC" value="Copy" style="width:70%;" onclick="doCalculate.copy(0);">
+                    <input type="button" class="MDMC_inbuttonC" value="✕" style="width:30%;" onclick="doCalculate.minus(0);">
+                </div>
+            </div>
+            <div class="MDMC_poke_row" id="dm_in_4" style="display:none">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:45%;">攻撃弾数</div>
+                    <div  id="dm_in_4_0" style="width:25%;">×1</div>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM4(1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM4(-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV" id="MDMC_rvCR0">
+                <div class="MDMC_openRVc" onclick="MDMC.dmOpenRev(0);"></div>
+                <div class="MDMC_inrevsBox" id="MDMC_ttrl0">
+                    <div id="MDMC_inrevs0_c" class="MDMC_inrevs" style="display: flex;">物理</div>
+                    <div id="MDMC_inrevs0_cr" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_r0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_r1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_r2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_3" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_4" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_5" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_6" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs0_puls" class="MDMC_inrevs" style="display: flex;">＋</div>
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV">
+                <div class="MDMC_openRVc" onclick="MDMC.dmChangeDm(0);"></div>
+                <div id="MDMC_ttrs0" style="margin-left: 2px; display:flex">▷0～0 (0%～0%)</div>
+                <div id="MDMC_ttrsR0" style="margin-left: 2px; display:none">乱数▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <br>急所▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+            </div>
+        </div>
+    </div>
+    <div class="MDMC_box MDMC_boxR" id="MDMC_tt1" style="display:none;">
+        <div class="MDMC_boxR_L">2</div>
+        <div class="MDMC_boxR_R" id="MDMC_ttCR1">
+            <div class="MDMC_poke_row">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:25%;">威力</div>
+                    <input autocomplete="off" class="MDMC_input" id="dm_in_11_20" type="search" value="80" style="width:45%;" oninput="MDMC.dmInput(11,20);" onchange="MDMC.finishSelect(11,20);"/>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM0(11,1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM0(11,-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                    <input type="button" class="MDMC_inbuttonC" value="Copy" style="width:70%;" onclick="doCalculate.copy(1);">
+                    <input type="button" class="MDMC_inbuttonC" value="✕" style="width:30%;" onclick="doCalculate.minus(1);">
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV" id="MDMC_rvCR1">
+                <div class="MDMC_openRVc" onclick="MDMC.dmOpenRev(1);"></div>
+                <div class="MDMC_inrevsBox" id="MDMC_ttrl1">
+                    <div id="MDMC_inrevs1_c" class="MDMC_inrevs" style="display: flex;">物理</div>
+                    <div id="MDMC_inrevs1_cr" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_r0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_r1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_r2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_3" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_4" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_5" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_6" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs1_puls" class="MDMC_inrevs" style="display: flex;">＋</div>
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV">
+                <div class="MDMC_openRVc" onclick="MDMC.dmChangeDm(1);"></div>
+                <div id="MDMC_ttrs1" style="margin-left: 2px; display:flex">▷0～0 (0%～0%)</div>
+                <div id="MDMC_ttrsR1" style="margin-left: 2px; display:none">乱数▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <br>急所▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+            </div>
+        </div>
+    </div>
+    <div class="MDMC_box MDMC_boxR" id="MDMC_tt2" style="display:none;">
+        <div class="MDMC_boxR_L">3</div>
+        <div class="MDMC_boxR_R" id="MDMC_ttCR2">
+            <div class="MDMC_poke_row">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:25%;">威力</div>
+                    <input autocomplete="off" class="MDMC_input" id="dm_in_12_20" type="search" value="80" style="width:45%;" oninput="MDMC.dmInput(12,20);" onchange="MDMC.finishSelect(12,20);"/>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM0(12,1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM0(12,-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                    <input type="button" class="MDMC_inbuttonC" value="Copy" style="width:70%;" onclick="doCalculate.copy(2);">
+                    <input type="button" class="MDMC_inbuttonC" value="✕" style="width:30%;" onclick="doCalculate.minus(2);">
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV" id="MDMC_rvCR2">
+                <div class="MDMC_openRVc" onclick="MDMC.dmOpenRev(2);"></div>
+                <div class="MDMC_inrevsBox" id="MDMC_ttrl2">
+                    <div id="MDMC_inrevs2_c" class="MDMC_inrevs" style="display: flex;">物理</div>
+                    <div id="MDMC_inrevs2_cr" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_r0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_r1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_r2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_3" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_4" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_5" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_6" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs2_puls" class="MDMC_inrevs" style="display: flex;">＋</div>
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV">
+                <div class="MDMC_openRVc" onclick="MDMC.dmChangeDm(2);"></div>
+                <div id="MDMC_ttrs2" style="margin-left: 2px; display:flex">▷0～0 (0%～0%)</div>
+                <div id="MDMC_ttrsR2" style="margin-left: 2px; display:none">乱数▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <br>急所▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+            </div>
+        </div>
+    </div>
+    <div class="MDMC_box MDMC_boxR" id="MDMC_tt3" style="display:none;">
+        <div class="MDMC_boxR_L">4</div>
+        <div class="MDMC_boxR_R" id="MDMC_ttCR3">
+            <div class="MDMC_poke_row">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:25%;">威力</div>
+                    <input autocomplete="off" class="MDMC_input" id="dm_in_13_20" type="search" value="80" style="width:45%;" oninput="MDMC.dmInput(13,20);" onchange="MDMC.finishSelect(13,20);"/>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM0(13,1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM0(13,-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                    <input type="button" class="MDMC_inbuttonC" value="Copy" style="width:70%;" onclick="doCalculate.copy(3);">
+                    <input type="button" class="MDMC_inbuttonC" value="✕" style="width:30%;" onclick="doCalculate.minus(3);">
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV" id="MDMC_rvCR3">
+                <div class="MDMC_openRVc" onclick="MDMC.dmOpenRev(3);"></div>
+                <div class="MDMC_inrevsBox" id="MDMC_ttrl1">
+                    <div id="MDMC_inrevs3_c" class="MDMC_inrevs" style="display: flex;">物理</div>
+                    <div id="MDMC_inrevs3_cr" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_r0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_r1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_r2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_3" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_4" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_5" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_6" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs3_puls" class="MDMC_inrevs" style="display: flex;">＋</div>
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV">
+                <div class="MDMC_openRVc" onclick="MDMC.dmChangeDm(3);"></div>
+                <div id="MDMC_ttrs3" style="margin-left: 2px; display:flex">▷0～0 (0%～0%)</div>
+                <div id="MDMC_ttrsR3" style="margin-left: 2px; display:none">乱数▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <br>急所▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+            </div>
+        </div>
+    </div>
+    <div class="MDMC_box MDMC_boxR" id="MDMC_tt4" style="display:none;">
+        <div class="MDMC_boxR_L">5</div>
+        <div class="MDMC_boxR_R" id="MDMC_ttCR4">
+            <div class="MDMC_poke_row">
+                <div class="MDMC_poke_cell" style="width:71%;">
+                    <div class="MDMC_intitle" style="width:25%;">威力</div>
+                    <input autocomplete="off" class="MDMC_input" id="dm_in_14_20" type="search" value="80" style="width:45%;" oninput="MDMC.dmInput(14,20);" onchange="MDMC.finishSelect(14,20);"/>
+                    <input type="button" class="MDMC_inbuttonC" value="▲" style="width:15%;" onclick="MDMC.dmPushPM0(14,1);">
+                    <input type="button" class="MDMC_inbuttonC" value="▼" style="width:15%;" onclick="MDMC.dmPushPM0(14,-1);">
+                </div>
+                <div class="MDMC_poke_cell MDMC_turnButton" style="width:29%;">
+                    <input type="button" class="MDMC_inbuttonC" value="Copy" style="width:70%;" onclick="doCalculate.copy(4);">
+                    <input type="button" class="MDMC_inbuttonC" value="✕" style="width:30%;" onclick="doCalculate.minus(4);">
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV" id="MDMC_rvCR4">
+                <div class="MDMC_openRVc" onclick="MDMC.dmOpenRev(4);"></div>
+                <div class="MDMC_inrevsBox" id="MDMC_ttrl4">
+                    <div id="MDMC_inrevs4_c" class="MDMC_inrevs" style="display: flex;">物理</div>
+                    <div id="MDMC_inrevs4_cr" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_r0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_r1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_r2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_0" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_1" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_2" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_3" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_4" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_5" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_6" class="MDMC_inrevs" style="display: none;"></div>
+                    <div id="MDMC_inrevs4_puls" class="MDMC_inrevs" style="display: flex;">＋</div>
+                </div>
+            </div>
+            <div class="MDMC_poke_row MDMC_openRV">
+                <div class="MDMC_openRVc" onclick="MDMC.dmChangeDm(4);"></div>
+                <div id="MDMC_ttrs4" style="margin-left: 2px; display:flex">▷0～0 (0%～0%)</div>
+                <div id="MDMC_ttrsR4" style="margin-left: 2px; display:none">乱数▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 <br>急所▷ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</div>
+            </div>
+        </div>
+    </div>
+    <div id="MDMC_ttLast" class="MDMC_box MDMC_boxB">
+        <input type="button" class="MDMC_bt MDMC_bt_in MDMC_bt_plus round_button" value="＋" onclick="doCalculate.plus();">
+    </div>
+    <div class="MDMC_box MDMC_boxResult">
+        <div id="MDMC_result">
+            <div class="MDMC_r_tr">
+                <div class="MDMC_r_th">ダメージ</div>
+                <div class="MDMC_r_td" id="MDMC_rta"></div>
+            </div>
+            <div class="MDMC_r_tr">
+                <div class="MDMC_r_th">瀕死率</div>
+                <div class="MDMC_r_td" id="MDMC_rtb"></div>
+            </div>
+            <div class="MDMC_r_tr">
+                <div class="MDMC_r_th">実質瀕死率</div>
+                <div class="MDMC_r_td" id="MDMC_rtc"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="MDMC_column MDMC_column_r">
+    <div class="MDMC_c_band MDMC_c_bandup">
+        <div class="MDMC_column MDMC_column_rm">
+            <div class="MDMC_box">
+                <div class="MDMC_poke_row">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin b_double" style="width:77%; font-size:140%;">
+                        <div style="width:17%; color:#ff0000; font-weight:700">攻.</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_0" type="search" style="width:83%;" oninput="MDMC.dmInput(1,0);" onchange="MDMC.finishSelect(1,0);"/>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:23%;">
+                        <div style="width:40%;">Lv.</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_1" type="search" value="50" style="width:60%;" oninput="MDMC.dmInput(1,1);" onchange="MDMC.finishSelect(1,1);"/>
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusA1" style="display:flex;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin MDMC_abtitle" style="width:23%;">
+                        <div id="dm_in_1_2h">攻撃</div>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:77%;">
+                        <div class="MDMC_intitle" style="width:30%;">実数値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_2" type="search" style="width:46%;" oninput="MDMC.dmInput(1,2);" onchange="MDMC.finishSelect(1,2);"/>
+                        <input type="button" class="MDMC_inbuttonB" value="▲" style="width:12%;" onclick="MDMC.dmPushPM(1,2,1);">
+                        <input type="button" class="MDMC_inbuttonB" value="▼" style="width:12%;" onclick="MDMC.dmPushPM(1,2,-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusA2" style="display:flex;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:55%;">個体値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_4" type="search" value="31" style="width:45%;" oninput="MDMC.dmInput(1,4);" onchange="MDMC.finishSelect(1,4);"/>
+                    </div>
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:40%;">
+                        <div class="MDMC_intitle" style="width:55%;">努力値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_3" type="search" value="252" list="evListA" style="width:45%;" oninput="MDMC.dmInput(1,3);" onchange="MDMC.finishSelect(1,3);"/>
+                        <datalist id="evListA">
+                            <option value="252">252</option>
+                        </datalist>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:45%;">性格</div>
+                        <input type="button" class="MDMC_inbuttonB" id="dm_in_1_5" value="×1.0" style="width:55%;" onclick="MDMC.dmPushNat(1,0);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusC1" style="display:none;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin MDMC_abtitle" style="width:23%;">
+                        <div id="dm_in_1_7h">特攻</div>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:77%;">
+                        <div class="MDMC_intitle" style="width:30%;">実数値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_7" type="search" style="width:46%;" oninput="MDMC.dmInput(1,7);" onchange="MDMC.finishSelect(1,7);"/>
+                        <input type="button" class="MDMC_inbuttonB" value="▲" style="width:12%;" onclick="MDMC.dmPushPM(1,7,1);">
+                        <input type="button" class="MDMC_inbuttonB" value="▼" style="width:12%;" onclick="MDMC.dmPushPM(1,7,-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusC2" style="display:none;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:55%;">個体値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_9" type="search" value="31" style="width:45%;" oninput="MDMC.dmInput(1,9);" onchange="MDMC.finishSelect(1,9);"/>
+                    </div>
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:40%;">
+                        <div class="MDMC_intitle" style="width:55%;">努力値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_1_8" type="search" value="252" list="evListC" style="width:45%;" oninput="MDMC.dmInput(1,8);" onchange="MDMC.finishSelect(1,8);"/>
+                        <datalist id="evListC">
+                            <option value="252">252</option>
+                        </datalist>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:45%;">性格</div>
+                        <input type="button" class="MDMC_inbuttonB" id="dm_in_1_10" value="×1.0" style="width:55%;" onclick="MDMC.dmPushNat(1,1);">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="MDMC_column MDMC_column_rm">
+            <div class="MDMC_box">
+                <div class="MDMC_poke_row">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin b_double" style="width:77%; font-size:140%;">
+                        <div style="width:17%; color:#2a72dd; font-weight:700">受.</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_0" type="search" style="width:83%;" oninput="MDMC.dmInput(2,0);" onchange="MDMC.finishSelect(2,0);"/>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:23%;">
+                        <div style="width:40%;">Lv.</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_1" type="search" value="50" style="width:60%;" oninput="MDMC.dmInput(2,1);" onchange="MDMC.finishSelect(2,1);"/>
+                    </div>
+                </div>
+                <div class="MDMC_poke_row">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin MDMC_abtitle" style="width:23%;">
+                        <div>HP</div>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:77%;">
+                        <div class="MDMC_intitle" style="width:30%;">実数値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_12" type="search" style="width:46%;" oninput="MDMC.dmInput(2,12);" onchange="MDMC.finishSelect(2,12);"/>
+                        <input type="button" class="MDMC_inbuttonB" value="▲" style="width:12%;" onclick="MDMC.dmPushPM(2,12,1);">
+                        <input type="button" class="MDMC_inbuttonB" value="▼" style="width:12%;" onclick="MDMC.dmPushPM(2,12,-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:28%;">
+                        <div class="MDMC_intitle" style="width:55%;">個体値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_14" type="search" value="31" style="width:45%;" oninput="MDMC.dmInput(2,14);" onchange="MDMC.finishSelect(2,14);"/>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:72%;">
+                        <div class="MDMC_intitle" style="width:30%;">努力値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_13" type="search" value="0" list="evListH" style="width:40%;" oninput="MDMC.dmInput(2,13);" onchange="MDMC.finishSelect(2,13);"/>
+                        <datalist id="evListH">
+                            <option value="252">252</option>
+                        </datalist>
+                        <div style="width:30%"></div>
+                    </div>
+                </div>
+                <div class="MDMC_poke_row">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:40%;">
+                        <div class="MDMC_intitle" style="width:50%;">HP回復</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_15" type="search" value="0" style="width:50%;" oninput="MDMC.dmInput(2,15);" onchange="MDMC.finishSelect(2,15);"/>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:60%;">
+                        <div class="MDMC_intitle" style="width:30%;">ステロ</div>
+                        <input type="button" class="MDMC_inbuttonB" id="dm_button_stero" value="OFF" style="width:38%;" onclick="MDMC.dmPushStero(0);">
+                        <input type="button" class="MDMC_inbuttonB" value="+" style="width:16%;" onclick="MDMC.dmPushStero(1);">
+                        <input type="button" class="MDMC_inbuttonB" value="-" style="width:16%;" onclick="MDMC.dmPushStero(-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusB1" style="display:flex;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin MDMC_abtitle" style="width:23%;">
+                        <div id="dm_in_2_2h">防御</div>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:77%;">
+                        <div class="MDMC_intitle" style="width:30%;">実数値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_2" type="search" style="width:46%;" oninput="MDMC.dmInput(2,2);" onchange="MDMC.finishSelect(2,2);"/>
+                        <input type="button" class="MDMC_inbuttonB" value="▲" style="width:12%;" onclick="MDMC.dmPushPM(2,2,1);">
+                        <input type="button" class="MDMC_inbuttonB" value="▼" style="width:12%;" onclick="MDMC.dmPushPM(2,2,-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusB2" style="display:flex;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:55%;">個体値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_4" type="search" value="31" style="width:45%;" oninput="MDMC.dmInput(2,4);" onchange="MDMC.finishSelect(2,4);"/>
+                    </div>
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:40%;">
+                        <div class="MDMC_intitle" style="width:55%;">努力値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_3" type="search" value="0" list="evListB" style="width:45%;" oninput="MDMC.dmInput(2,3);" onchange="MDMC.finishSelect(2,3);"/>
+                        <datalist id="evListB">
+                            <option value="252">252</option>
+                        </datalist>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:45%;">性格</div>
+                        <input type="button" class="MDMC_inbuttonB" id="dm_in_2_5" value="×1.0" style="width:55%;" onclick="MDMC.dmPushNat(2,0);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusD1" style="display:none;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin MDMC_abtitle" style="width:23%;">
+                        <div id="dm_in_2_7h">特防</div>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:77%;">
+                        <div class="MDMC_intitle" style="width:30%;">実数値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_7" type="search" style="width:46%;" oninput="MDMC.dmInput(2,7);" onchange="MDMC.finishSelect(2,7);"/>
+                        <input type="button" class="MDMC_inbuttonB" value="▲" style="width:12%;" onclick="MDMC.dmPushPM(2,7,1);">
+                        <input type="button" class="MDMC_inbuttonB" value="▼" style="width:12%;" onclick="MDMC.dmPushPM(2,7,-1);">
+                    </div>
+                </div>
+                <div class="MDMC_poke_row" id="MDMC_statusD2" style="display:none;">
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:55%;">個体値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_9" type="search" value="31" style="width:45%;" oninput="MDMC.dmInput(2,9);" onchange="MDMC.finishSelect(2,9);"/>
+                    </div>
+                    <div class="MDMC_poke_cell MDMC_p_c_MakeMargin" style="width:40%;">
+                        <div class="MDMC_intitle" style="width:55%;">努力値</div>
+                        <input autocomplete="off" class="MDMC_input" id="dm_in_2_8" type="search" value="0" list="evListD" style="width:45%;" oninput="MDMC.dmInput(2,8);" onchange="MDMC.finishSelect(2,8);"/>
+                        <datalist id="evListD">
+                            <option value="252">252</option>
+                        </datalist>
+                    </div>
+                    <div class="MDMC_poke_cell" style="width:30%;">
+                        <div class="MDMC_intitle" style="width:45%;">性格</div>
+                        <input type="button" class="MDMC_inbuttonB" id="dm_in_2_10" value="×1.0" style="width:55%;" onclick="MDMC.dmPushNat(2,1);">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MDMC_RLpage" style="display:none;">
+    <div id="MDMC_RLbase" class="MDMC_box MDMC_boxB">
+        <input type="button" class="MDMC_bt MDMC_bt_in round_button MDMC_RLclose" value="CLOSE✕" onclick="MDMC.dmCloseRev();">
+    </div>
+    <div class="MDMC_RScroll">
+        <div class="MDMC_RLrow" style="margin-bottom:3px">
+            <input type="button" class="MDMC_inbutton_cat" id="dm_button_RLcat_a" value="物理" style="width:50%; border-color:#ff0000;" onclick="MDMC.dmPushCat(0);">
+            <input type="button" class="MDMC_inbutton_cat" id="dm_button_RLcat_b" value="特殊" style="width:50%; border-color:#ddd;" onclick="MDMC.dmPushCat(1);">
+        </div>
+        <div class="MDMC_RLrow">
+            <div class="MDMC_RL_title MDMC_rlc MDMC_RLtitle1" style="width:50%;">攻ランク</div>
+            <div class="MDMC_rlc MDMC_rlbw" id="dm_in_3_0" style="width:20%;">0</div>
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▲" style="width:15%;" onclick="MDMC.dmPushPM3(0,1);">
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▼" style="width:15%;" onclick="MDMC.dmPushPM3(0,-1);">
+        </div>
+        <div class="MDMC_RLrow">
+            <div class="MDMC_RL_title MDMC_rlc MDMC_RLtitle2" style="width:50%;">受ランク</div>
+            <div class="MDMC_rlc MDMC_rlbw" id="dm_in_3_1" style="width:20%;">0</div>
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▲" style="width:15%;" onclick="MDMC.dmPushPM3(1,1);">
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▼" style="width:15%;" onclick="MDMC.dmPushPM3(1,-1);">
+        </div>
+        <div class="MDMX_RLbox">
+            <div class="MDMC_RList">
+                <div class="MDMC_RL_title">環境補正</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B00" value="天候強化" onclick="ReList.pushRevices('B','00',64,6144,'天候×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B01" value="天候減衰" onclick="ReList.pushRevices('B','01',63,2048,'天候×0.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B02" value="フィールド強化" onclick="ReList.pushRevices('B','02',10,5325,'フィールド×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B03" value="フィールド減衰" onclick="ReList.pushRevices('B','03',10,2048,'フィールド×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B04" value="やけど" onclick="ReList.pushRevices('B','04',67,2048,'やけど×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B05" value="壁" onclick="ReList.pushRevices('B','05',70,2048,'壁×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B06" value="ダブル壁" onclick="ReList.pushRevices('B','06',70,2732,'ダブル壁×2/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_B07" value="範囲技減衰" onclick="ReList.pushRevices('B','07',61,3072,'ダブル範囲減衰×2/3');">
+                <div class="MDMC_RL_title">×2</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D00" value="巨剣突撃後" onclick="ReList.pushRevices('D','00',70,8192,'きょけん突撃後×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D01" value="アクロバット" onclick="ReList.pushRevices('D','01',11,8192,'アクロバット×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D02" value="じゅうでん" onclick="ReList.pushRevices('D','02',10,8192,'じゅうでん×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D03" value="しおみず" onclick="ReList.pushRevices('D','03',10,8192,'しおみず×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D04" value="からげんき" onclick="ReList.pushRevices('D','04',10,8192,'からげんき×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D05" value="ライジングボルト" onclick="ReList.pushRevices('D','05',10,8192,'ライジングボルト×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D06" value="エラ噛み/でんくち" onclick="ReList.pushRevices('D','06',11,8192,'先制威力×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D07" value="すいほう水強化" onclick="ReList.pushRevices('D','07',30,8192,'すいほう×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D08" value="はりこみ" onclick="ReList.pushRevices('D','08',30,8192,'はりこみ×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D09" value="いろめがね" onclick="ReList.pushRevices('D','09',70,8192,'いろめがね×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D10" value="炎技＋もふもふ" onclick="ReList.pushRevices('D','10',70,8192,'もふもふ×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D11" value="ダメおし" onclick="ReList.pushRevices('D','11',11,8192,'ダメおし×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D12" value="クロスサンダー" onclick="ReList.pushRevices('D','12',10,8192,'クロスサンダー×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D13" value="かたきうち" onclick="ReList.pushRevices('D','13',10,8192,'かたきうち×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D14" value="ベノムショック" onclick="ReList.pushRevices('D','14',10,8192,'ベノムショック×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D15" value="地震＋穴を掘る" onclick="ReList.pushRevices('D','15',70,8192,'地中命中×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D16" value="ふみつけ系" onclick="ReList.pushRevices('D','16',70,8192,'ふみつけ×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_D17" value="太いホネ/電気玉" onclick="ReList.pushRevices('D','17',30,8192,'専用アイテム×2');">
+                <div class="MDMC_RL_title">×1.33</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_F00" value="ひひいろの鼓動系" onclick="ReList.pushRevices('F','00',30,5461,'ひひいろ/ハドロン×1.33');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_F01" value="イナドラ系+弱点" onclick="ReList.pushRevices('F','01',70,5461,'弱点攻撃×1.33');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_F02" value="オーラ系" onclick="ReList.pushRevices('F','02',10,5448,'オーラ系×1.33');">
+                <div class="MDMC_RL_title">×1.3</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G00" value="アナライズ" onclick="ReList.pushRevices('G','00',10,5325,'アナライズ×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G01" value="○○ジュエル" onclick="ReList.pushRevices('G','01',10,5325,'ジュエル×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G02" value="かたいツメ" onclick="ReList.pushRevices('G','02',10,5325,'かたいツメ×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G03" value="ちからずく" onclick="ReList.pushRevices('G','03',10,5325,'ちからずく×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G04" value="パンクロック攻" onclick="ReList.pushRevices('G','04',10,5325,'パンクロック攻×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G05" value="すなのちから" onclick="ReList.pushRevices('G','05',10,5325,'すなのちから×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G06" value="バッテリー" onclick="ReList.pushRevices('G','06',10,5325,'バッテリー×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_G07" value="パワースポット" onclick="ReList.pushRevices('G','07',10,5325,'パワースポット×1.3');">
+                <div class="MDMC_RL_title">×1.25</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_H00" value="ブレインフォース" onclick="ReList.pushRevices('H','00',70,5120,'ブレインフォース×1.25');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_H01" value="とうそうしん強" onclick="ReList.pushRevices('H','01',10,5120,'とうそうしん×1.25');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_H02" value="炎技＋乾燥肌" onclick="ReList.pushRevices('H','02',10,5120,'乾燥肌×1.25');">
+                <div class="MDMC_RL_title">×0.75</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_K00" value="フィルター系" onclick="ReList.pushRevices('K','00',70,3072,'フィルター×3/4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_K01" value="オーラブレイク" onclick="ReList.pushRevices('K','01',10,3072,'オーラブレイク×3/4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_K02" value="フレンドガード" onclick="ReList.pushRevices('K','02',70,3072,'フレンドガード×3/4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_K03" value="とうそうしん弱" onclick="ReList.pushRevices('K','03',10,3072,'とうそうしん×3/4');">
+                <div class="MDMC_RL_title">×0.67</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_L00" value="ふしぎなうろこ" onclick="ReList.pushRevices('L','00',50,6144,'ふしぎなうろこ×2/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_L01" value="くさのけがわ" onclick="ReList.pushRevices('L','01',50,6144,'くさのけがわ×2/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_L02" value="フラワーギフト弱" onclick="ReList.pushRevices('L','02',50,6144,'フラワーギフト×2/3');">
+                <div class="MDMC_RL_title">メトロノーム</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_O00" value="2発目×1.2" onclick="ReList.pushRevices('O','00',70,4915,'メトロノーム×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_O01" value="3発目×1.4" onclick="ReList.pushRevices('O','01',70,5734,'メトロノーム×1.4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_O02" value="4発目×1.6" onclick="ReList.pushRevices('O','02',70,6553,'メトロノーム×1.6');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_O03" value="5発目×1.8" onclick="ReList.pushRevices('O','03',70,7372,'メトロノーム×1.8');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_O04" value="6発目×2" onclick="ReList.pushRevices('O','04',70,8192,'メトロノーム×2');">
+                <div class="MDMC_RL_title">そうだいしょう</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_P00" value="1匹×1.1" onclick="ReList.pushRevices('P','00',10,4505,'総大将×1.1');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_P01" value="2匹×1.2" onclick="ReList.pushRevices('P','01',10,4915,'総大将×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_P02" value="3匹×1.3" onclick="ReList.pushRevices('P','02',10,5325,'総大将×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_P03" value="4匹×1.4" onclick="ReList.pushRevices('P','03',10,5734,'総大将×1.4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_P04" value="5匹×1.5" onclick="ReList.pushRevices('P','04',10,6144,'総大将×1.5');">
+            </div>
+            <div class="MDMC_RList">
+                <div class="MDMC_RL_title">タイプ一致</div>
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A00" value="×1.5" onclick="ReList.pushRevices('A','00',65,6144,'タイプ一致×1.5');">
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A01" value="×2" onclick="ReList.pushRevices('A','01',65,8192,'テラス一致×2');">
+                <div class="MDMC_RL_title">タイプ相性</div>
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A02" style="width:25%;" value="×1/4" onclick="ReList.pushRevices('A','02',66,1024,'四減×1/4');">
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A03" style="width:25%;" value="×1/2" onclick="ReList.pushRevices('A','03',66,2048,'半減×1/2');">
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A04" style="width:25%;" value="×2" onclick="ReList.pushRevices('A','04',66,8192,'抜群×2');">
+                <input type="button" class="MDMC_Rbt MDMC_RbtType" id="MDMC_Rbt_A05" style="width:25%;" value="×4" onclick="ReList.pushRevices('A','05',66,16384,'抜群×4');">
+                <div class="MDMC_RL_title">メイン補正</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C00" value="こだわり系" onclick="ReList.pushRevices('C','00',30,6144,'こだわり×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C01" value="命の珠" onclick="ReList.pushRevices('C','01',70,5324,'命の珠×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C02" value="輝石/チョッキ" onclick="ReList.pushRevices('C','02',50,6144,'輝石/チョッキ×2/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C03" value="砂+岩/雪+氷" onclick="ReList.pushRevices('C','03',51,6144,'砂+岩/雪+氷×2/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C04" value="清めの塩" onclick="ReList.pushRevices('C','04',30,2048,'清めの塩×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C05" value="マルスケ" onclick="ReList.pushRevices('C','05',70,2048,'マルスケ×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C06" value="叩き落とす" onclick="ReList.pushRevices('C','06',10,6144,'叩き落とす×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C07" value="ちからもち系" onclick="ReList.pushRevices('C','07',30,8192,'ちからもち系×2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C08" value="古代活性系(攻)" onclick="ReList.pushRevices('C','08',30,5325,'古代活性×1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C09" value="古代活性系(受)" onclick="ReList.pushRevices('C','09',50,5325,'古代活性×1/1.3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C10" value="わざわい系×1.33" onclick="ReList.pushRevices('C','10',50,3072,'わざわい×1.33');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_C11" value="わざわい系×0.75" onclick="ReList.pushRevices('C','11',30,3072,'わざわい×3/4');">
+                <div class="MDMC_RL_title">×1.5</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E00" value="テクニシャン" onclick="ReList.pushRevices('E','00',10,6144,'テクニシャン×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E01" value="きれあじ" onclick="ReList.pushRevices('E','01',10,6144,'きれあじ×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E02" value="しんりょく系" onclick="ReList.pushRevices('E','02',30,6144,'HP1/3以下×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E03" value="もらいび" onclick="ReList.pushRevices('E','03',30,6144,'もらいび×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E04" value="はりきり" onclick="ReList.pushRevices('E','04',30,6144,'はりきり×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E05" value="こんじょう" onclick="ReList.pushRevices('E','05',30,6144,'こんじょう×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E06" value="サンパワー" onclick="ReList.pushRevices('E','06',30,6144,'サンパワー×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E07" value="はがねのせいしん" onclick="ReList.pushRevices('E','07',10,6144,'はがねのせいしん×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E08" value="はがねつかい" onclick="ReList.pushRevices('E','08',30,6144,'はがねつかい×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E09" value="いわはこび" onclick="ReList.pushRevices('E','09',30,6144,'いわはこび×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E10" value="がんじょうあご" onclick="ReList.pushRevices('E','10',10,6144,'がんじょうあご×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E11" value="メガランチャー" onclick="ReList.pushRevices('E','11',10,6144,'メガランチャー×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E12" value="ごりむちゅう" onclick="ReList.pushRevices('E','12',30,6144,'ごりむちゅう×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E13" value="トランジスタ系" onclick="ReList.pushRevices('E','13',30,6144,'トランジスタ系×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E14" value="毒暴走/熱暴走" onclick="ReList.pushRevices('E','14',10,6144,'毒暴走/熱暴走×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E15" value="フラワーギフト攻" onclick="ReList.pushRevices('E','15',30,6144,'フラワーギフト×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E16" value="ワイドフォース" onclick="ReList.pushRevices('E','16',10,6144,'ワイドフォース×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E17" value="Gのちから" onclick="ReList.pushRevices('E','17',10,6144,'Gのちから×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E18" value="てだすけ" onclick="ReList.pushRevices('E','18',10,6144,'てだすけ×1.5');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_E19" value="プラス/マイナス" onclick="ReList.pushRevices('E','19',30,6144,'プラス/マイナス×1.5');">
+                <div class="MDMC_RL_title">×1.2</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_I00" value="○○スキン" onclick="ReList.pushRevices('I','00',10,4915,'○○スキン×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_I01" value="てつのこぶし" onclick="ReList.pushRevices('I','01',10,4915,'てつのこぶし×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_I02" value="たつじんのおび" onclick="ReList.pushRevices('I','02',70,4915,'たつじんのおび×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_I03" value="タイプ強化系" onclick="ReList.pushRevices('I','03',10,4915,'タイプ強化系×1.2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_I04" value="すてみ" onclick="ReList.pushRevices('I','04',10,4915,'すてみ×1.2');">
+                <div class="MDMC_RL_title">×1.1</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_J00" value="ちからのハチマキ" onclick="ReList.pushRevices('J','00',10,4505,'ちからのハチマキ×1.1');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_J01" value="ものしりメガネ" onclick="ReList.pushRevices('J','01',10,4505,'ものしりメガネ×1.1');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_J02" value="パンチグローブ" onclick="ReList.pushRevices('J','02',10,4506,'パンチグローブ×1.1');">
+                <div class="MDMC_RL_title">×0.5</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M00" value="半減きのみ" onclick="ReList.pushRevices('M','00',70,2048,'半減きのみ×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M01" value="ファーコート" onclick="ReList.pushRevices('M','01',50,8192,'ファーコート×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M02" value="こおりのりんぷん" onclick="ReList.pushRevices('M','02',70,2048,'こおりのりんぷん×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M03" value="たいねつ" onclick="ReList.pushRevices('M','03',10,2048,'たいねつ×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M04" value="あついしぼう" onclick="ReList.pushRevices('M','04',30,2048,'あついしぼう×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M05" value="すいほう炎半減" onclick="ReList.pushRevices('M','05',30,2048,'すいほう×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M06" value="もふもふ半減" onclick="ReList.pushRevices('M','06',70,2048,'もふもふ×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M07" value="パンクロック受" onclick="ReList.pushRevices('M','07',70,2048,'パンクロック×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M08" value="深海の鱗/メタパ" onclick="ReList.pushRevices('M','08',50,8192,'専用アイテム×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M09" value="よわき" onclick="ReList.pushRevices('M','09',30,2048,'よわき×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M10" value="スロースタート" onclick="ReList.pushRevices('M','10',30,2048,'スロースタート×1/2');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_M11" value="ソラビ減衰" onclick="ReList.pushRevices('M','11',10,2048,'ソラビ減衰×1/2');">
+                <div class="MDMC_RL_title">その他</div>
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_N00" value="適応力テラス一致" onclick="ReList.pushRevices('N','00',65,9216,'適応力テラス一致×2.25');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_N01" value="親子愛2発目×1/4" onclick="ReList.pushRevices('N','01',62,1024,'親子愛2発目×1/4');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_N02" value="水/泥遊び×1/3" onclick="ReList.pushRevices('N','02',10,1352,'水/泥遊び×1/3');">
+                <input type="button" class="MDMC_Rbt" id="MDMC_Rbt_N03" value="スナイパー×1.5" onclick="ReList.pushRevices('N','03',72,6144,'スナイパー×1.5');">
+            </div>
+        </div>
+        <div class="MDMC_RLrow">
+            <div class="MDMC_RL_title MDMC_rlc MDMC_RLtitle3" style="width:50%;">攻撃弾数</div>
+            <div class="MDMC_rlc MDMC_rlbw" id="dm_in_4_1" style="width:20%;">1</div>
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▲" style="width:15%;" onclick="MDMC.dmPushPM4(1);">
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▼" style="width:15%;" onclick="MDMC.dmPushPM4(-1);">
+        </div>
+        <div class="MDMC_RLrow">
+            <div class="MDMC_RL_title MDMC_rlc MDMC_RLtitle3" style="width:50%;">急所ランク</div>
+            <div class="MDMC_rlc MDMC_rlbw" id="dm_in_3_2" style="width:20%;">0</div>
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▲" style="width:15%;" onclick="MDMC.dmPushPM3(2,1);">
+            <input type="button" class="MDMC_inbuttonD MDMC_rlbw" value="▼" style="width:15%;" onclick="MDMC.dmPushPM3(2,-1);">
+        </div>
+        <div class="MDMC_RLrow">
+            <div class="MDMC_RL_title MDMC_rlc MDMC_RLtitle3" style="width:50%;">受け分類反転</div>
+            <input type="button" class="MDMC_RLcat" id="dm_button_RLcat_c" value="反転" style="width:50%; color:#222;" onclick="MDMC.dmPushRv();">
+        </div>
+        <div style="margin-bottom: 20px"></div>
+    </div>
+</div>
+    <!-- 以下のポケモン名リストはPHPからの出力時にデータベースより動的出力-->
+    <div class="dmList"  id="dmList0">
+    <ul>
+        <li id="dmList0_0" value=0 name="ふしぎだね" onmousedown="MDMC.selectList(0);">フシギダネ</li>
+        <li id="dmList0_1" value=1 name="ふしぎそう" onmousedown="MDMC.selectList(1);">フシギソウ</li>
+        <li id="dmList0_2" value=2 name="ふしぎばな" onmousedown="MDMC.selectList(2);">フシギバナ</li>
+        <li id="dmList0_3" value=3 name="めがふしぎばな" onmousedown="MDMC.selectList(3);">メガフシギバナ</li>
+        <li id="dmList0_4" value=4 name="ひとかげ" onmousedown="MDMC.selectList(4);">ヒトカゲ</li>
+        <li id="dmList0_5" value=5 name="りざーど" onmousedown="MDMC.selectList(5);">リザード</li>
+        <li id="dmList0_6" value=6 name="りざーどん" onmousedown="MDMC.selectList(6);">リザードン</li>
+        <li id="dmList0_7" value=7 name="めがりざーどんX" onmousedown="MDMC.selectList(7);">メガリザードンX</li>
+        <li id="dmList0_8" value=8 name="めがりざーどんY" onmousedown="MDMC.selectList(8);">メガリザードンY</li>
+        <li id="dmList0_9" value=9 name="ぜにがめ" onmousedown="MDMC.selectList(9);">ゼニガメ</li>
+        <li id="dmList0_10" value=10 name="かめーる" onmousedown="MDMC.selectList(10);">カメール</li>
+        <li id="dmList0_11" value=11 name="かめっくす" onmousedown="MDMC.selectList(11);">カメックス</li>
+        <li id="dmList0_12" value=12 name="めがかめっくす" onmousedown="MDMC.selectList(12);">メガカメックス</li>
+        <li id="dmList0_13" value=13 name="きゃたぴー" onmousedown="MDMC.selectList(13);">キャタピー</li>
+        <li id="dmList0_14" value=14 name="とらんせる" onmousedown="MDMC.selectList(14);">トランセル</li>
+        <li id="dmList0_15" value=15 name="ばたふりー" onmousedown="MDMC.selectList(15);">バタフリー</li>
+        <li id="dmList0_16" value=16 name="びーどる" onmousedown="MDMC.selectList(16);">ビードル</li>
+        <li id="dmList0_17" value=17 name="こくーん" onmousedown="MDMC.selectList(17);">コクーン</li>
+        <li id="dmList0_18" value=18 name="すぴあー" onmousedown="MDMC.selectList(18);">スピアー</li>
+        <li id="dmList0_19" value=19 name="めがすぴあー" onmousedown="MDMC.selectList(19);">メガスピアー</li>
+        <li id="dmList0_20" value=20 name="ぽっぽ" onmousedown="MDMC.selectList(20);">ポッポ</li>
+        <li id="dmList0_21" value=21 name="ぴじょん" onmousedown="MDMC.selectList(21);">ピジョン</li>
+        <li id="dmList0_22" value=22 name="ぴじょっと" onmousedown="MDMC.selectList(22);">ピジョット</li>
+        <li id="dmList0_23" value=23 name="めがぴじょっと" onmousedown="MDMC.selectList(23);">メガピジョット</li>
+        <li id="dmList0_24" value=24 name="こらった" onmousedown="MDMC.selectList(24);">コラッタ</li>
+        <li id="dmList0_25" value=25 name="こらったA" onmousedown="MDMC.selectList(25);">コラッタA</li>
+        <li id="dmList0_26" value=26 name="らった" onmousedown="MDMC.selectList(26);">ラッタ</li>
+        <li id="dmList0_27" value=27 name="らったA" onmousedown="MDMC.selectList(27);">ラッタA</li>
+        <li id="dmList0_28" value=28 name="おにすずめ" onmousedown="MDMC.selectList(28);">オニスズメ</li>
+        <li id="dmList0_29" value=29 name="おにどりる" onmousedown="MDMC.selectList(29);">オニドリル</li>
+        <li id="dmList0_30" value=30 name="あーぼ" onmousedown="MDMC.selectList(30);">アーボ</li>
+        <li id="dmList0_31" value=31 name="あーぼっく" onmousedown="MDMC.selectList(31);">アーボック</li>
+        <li id="dmList0_32" value=32 name="ぴかちゅう" onmousedown="MDMC.selectList(32);">ピカチュウ</li>
+        <li id="dmList0_33" value=33 name="らいちゅう" onmousedown="MDMC.selectList(33);">ライチュウ</li>
+        <li id="dmList0_34" value=34 name="らいちゅうA" onmousedown="MDMC.selectList(34);">ライチュウA</li>
+        <li id="dmList0_35" value=35 name="さんど" onmousedown="MDMC.selectList(35);">サンド</li>
+        <li id="dmList0_36" value=36 name="さんどA" onmousedown="MDMC.selectList(36);">サンドA</li>
+        <li id="dmList0_37" value=37 name="さんどぱん" onmousedown="MDMC.selectList(37);">サンドパン</li>
+        <li id="dmList0_38" value=38 name="さんどぱんA" onmousedown="MDMC.selectList(38);">サンドパンA</li>
+        <li id="dmList0_39" value=39 name="にどらん♀" onmousedown="MDMC.selectList(39);">ニドラン♀</li>
+        <li id="dmList0_40" value=40 name="にどりーな" onmousedown="MDMC.selectList(40);">ニドリーナ</li>
+        <li id="dmList0_41" value=41 name="にどくいん" onmousedown="MDMC.selectList(41);">ニドクイン</li>
+        <li id="dmList0_42" value=42 name="にどらん♂" onmousedown="MDMC.selectList(42);">ニドラン♂</li>
+        <li id="dmList0_43" value=43 name="にどりーの" onmousedown="MDMC.selectList(43);">ニドリーノ</li>
+        <li id="dmList0_44" value=44 name="にどきんぐ" onmousedown="MDMC.selectList(44);">ニドキング</li>
+        <li id="dmList0_45" value=45 name="ぴっぴ" onmousedown="MDMC.selectList(45);">ピッピ</li>
+        <li id="dmList0_46" value=46 name="ぴくしー" onmousedown="MDMC.selectList(46);">ピクシー</li>
+        <li id="dmList0_47" value=47 name="ろこん" onmousedown="MDMC.selectList(47);">ロコン</li>
+        <li id="dmList0_48" value=48 name="ろこんA" onmousedown="MDMC.selectList(48);">ロコンA</li>
+        <li id="dmList0_49" value=49 name="きゅうこん" onmousedown="MDMC.selectList(49);">キュウコン</li>
+        <li id="dmList0_50" value=50 name="きゅうこんA" onmousedown="MDMC.selectList(50);">キュウコンA</li>
+        <li id="dmList0_51" value=51 name="ぷりん" onmousedown="MDMC.selectList(51);">プリン</li>
+        <li id="dmList0_52" value=52 name="ぷくりん" onmousedown="MDMC.selectList(52);">プクリン</li>
+        <li id="dmList0_53" value=53 name="ずばっと" onmousedown="MDMC.selectList(53);">ズバット</li>
+        <li id="dmList0_54" value=54 name="ごるばっと" onmousedown="MDMC.selectList(54);">ゴルバット</li>
+        <li id="dmList0_55" value=55 name="なぞのくさ" onmousedown="MDMC.selectList(55);">ナゾノクサ</li>
+        <li id="dmList0_56" value=56 name="くさいはな" onmousedown="MDMC.selectList(56);">クサイハナ</li>
+        <li id="dmList0_57" value=57 name="らふれしあ" onmousedown="MDMC.selectList(57);">ラフレシア</li>
+        <li id="dmList0_58" value=58 name="ぱらす" onmousedown="MDMC.selectList(58);">パラス</li>
+        <li id="dmList0_59" value=59 name="ぱらせくと" onmousedown="MDMC.selectList(59);">パラセクト</li>
+        <li id="dmList0_60" value=60 name="こんぱん" onmousedown="MDMC.selectList(60);">コンパン</li>
+        <li id="dmList0_61" value=61 name="もるふぉん" onmousedown="MDMC.selectList(61);">モルフォン</li>
+        <li id="dmList0_62" value=62 name="でぃぐだ" onmousedown="MDMC.selectList(62);">ディグダ</li>
+        <li id="dmList0_63" value=63 name="でぃぐだA" onmousedown="MDMC.selectList(63);">ディグダA</li>
+        <li id="dmList0_64" value=64 name="だぐとりお" onmousedown="MDMC.selectList(64);">ダグトリオ</li>
+        <li id="dmList0_65" value=65 name="だぐとりおA" onmousedown="MDMC.selectList(65);">ダグトリオA</li>
+        <li id="dmList0_66" value=66 name="にゃーす" onmousedown="MDMC.selectList(66);">ニャース</li>
+        <li id="dmList0_67" value=67 name="にゃーすA" onmousedown="MDMC.selectList(67);">ニャースA</li>
+        <li id="dmList0_68" value=68 name="ぺるしあん" onmousedown="MDMC.selectList(68);">ペルシアン</li>
+        <li id="dmList0_69" value=69 name="ぺるしあんA" onmousedown="MDMC.selectList(69);">ペルシアンA</li>
+        <li id="dmList0_70" value=70 name="こだっく" onmousedown="MDMC.selectList(70);">コダック</li>
+        <li id="dmList0_71" value=71 name="ごるだっく" onmousedown="MDMC.selectList(71);">ゴルダック</li>
+        <li id="dmList0_72" value=72 name="まんきー" onmousedown="MDMC.selectList(72);">マンキー</li>
+        <li id="dmList0_73" value=73 name="おこりざる" onmousedown="MDMC.selectList(73);">オコリザル</li>
+        <li id="dmList0_74" value=74 name="がーでぃ" onmousedown="MDMC.selectList(74);">ガーディ</li>
+        <li id="dmList0_75" value=75 name="ういんでぃ" onmousedown="MDMC.selectList(75);">ウインディ</li>
+        <li id="dmList0_76" value=76 name="にょろも" onmousedown="MDMC.selectList(76);">ニョロモ</li>
+        <li id="dmList0_77" value=77 name="にょろぞ" onmousedown="MDMC.selectList(77);">ニョロゾ</li>
+        <li id="dmList0_78" value=78 name="にょろぼん" onmousedown="MDMC.selectList(78);">ニョロボン</li>
+        <li id="dmList0_79" value=79 name="けーしぃ" onmousedown="MDMC.selectList(79);">ケーシィ</li>
+        <li id="dmList0_80" value=80 name="ゆんげらー" onmousedown="MDMC.selectList(80);">ユンゲラー</li>
+        <li id="dmList0_81" value=81 name="ふーでぃん" onmousedown="MDMC.selectList(81);">フーディン</li>
+        <li id="dmList0_82" value=82 name="めがふーでぃん" onmousedown="MDMC.selectList(82);">メガフーディン</li>
+        <li id="dmList0_83" value=83 name="わんりきー" onmousedown="MDMC.selectList(83);">ワンリキー</li>
+        <li id="dmList0_84" value=84 name="ごーりきー" onmousedown="MDMC.selectList(84);">ゴーリキー</li>
+        <li id="dmList0_85" value=85 name="かいりきー" onmousedown="MDMC.selectList(85);">カイリキー</li>
+        <li id="dmList0_86" value=86 name="まだつぼみ" onmousedown="MDMC.selectList(86);">マダツボミ</li>
+        <li id="dmList0_87" value=87 name="うつどん" onmousedown="MDMC.selectList(87);">ウツドン</li>
+        <li id="dmList0_88" value=88 name="うつぼっと" onmousedown="MDMC.selectList(88);">ウツボット</li>
+        <li id="dmList0_89" value=89 name="めのくらげ" onmousedown="MDMC.selectList(89);">メノクラゲ</li>
+        <li id="dmList0_90" value=90 name="どくくらげ" onmousedown="MDMC.selectList(90);">ドククラゲ</li>
+        <li id="dmList0_91" value=91 name="いしつぶて" onmousedown="MDMC.selectList(91);">イシツブテ</li>
+        <li id="dmList0_92" value=92 name="いしつぶてA" onmousedown="MDMC.selectList(92);">イシツブテA</li>
+        <li id="dmList0_93" value=93 name="ごろーん" onmousedown="MDMC.selectList(93);">ゴローン</li>
+        <li id="dmList0_94" value=94 name="ごろーんA" onmousedown="MDMC.selectList(94);">ゴローンA</li>
+        <li id="dmList0_95" value=95 name="ごろーにゃ" onmousedown="MDMC.selectList(95);">ゴローニャ</li>
+        <li id="dmList0_96" value=96 name="ごろーにゃA" onmousedown="MDMC.selectList(96);">ゴローニャA</li>
+        <li id="dmList0_97" value=97 name="ぽにーた" onmousedown="MDMC.selectList(97);">ポニータ</li>
+        <li id="dmList0_98" value=98 name="ぎゃろっぷ" onmousedown="MDMC.selectList(98);">ギャロップ</li>
+        <li id="dmList0_99" value=99 name="やどん" onmousedown="MDMC.selectList(99);">ヤドン</li>
+        <li id="dmList0_100" value=100 name="やどらん" onmousedown="MDMC.selectList(100);">ヤドラン</li>
+        <li id="dmList0_101" value=101 name="めがやどらん" onmousedown="MDMC.selectList(101);">メガヤドラン</li>
+        <li id="dmList0_102" value=102 name="こいる" onmousedown="MDMC.selectList(102);">コイル</li>
+        <li id="dmList0_103" value=103 name="れあこいる" onmousedown="MDMC.selectList(103);">レアコイル</li>
+        <li id="dmList0_104" value=104 name="かもねぎ" onmousedown="MDMC.selectList(104);">カモネギ</li>
+        <li id="dmList0_105" value=105 name="どーどー" onmousedown="MDMC.selectList(105);">ドードー</li>
+        <li id="dmList0_106" value=106 name="どーどりお" onmousedown="MDMC.selectList(106);">ドードリオ</li>
+        <li id="dmList0_107" value=107 name="ぱうわう" onmousedown="MDMC.selectList(107);">パウワウ</li>
+        <li id="dmList0_108" value=108 name="じゅごん" onmousedown="MDMC.selectList(108);">ジュゴン</li>
+        <li id="dmList0_109" value=109 name="べとべたー" onmousedown="MDMC.selectList(109);">ベトベター</li>
+        <li id="dmList0_110" value=110 name="べとべたーA" onmousedown="MDMC.selectList(110);">ベトベターA</li>
+        <li id="dmList0_111" value=111 name="べとべとん" onmousedown="MDMC.selectList(111);">ベトベトン</li>
+        <li id="dmList0_112" value=112 name="べとべとんA" onmousedown="MDMC.selectList(112);">ベトベトンA</li>
+        <li id="dmList0_113" value=113 name="しぇるだー" onmousedown="MDMC.selectList(113);">シェルダー</li>
+        <li id="dmList0_114" value=114 name="ぱるしぇん" onmousedown="MDMC.selectList(114);">パルシェン</li>
+        <li id="dmList0_115" value=115 name="ごーす" onmousedown="MDMC.selectList(115);">ゴース</li>
+        <li id="dmList0_116" value=116 name="ごーすと" onmousedown="MDMC.selectList(116);">ゴースト</li>
+        <li id="dmList0_117" value=117 name="げんがー" onmousedown="MDMC.selectList(117);">ゲンガー</li>
+        <li id="dmList0_118" value=118 name="めがげんがー" onmousedown="MDMC.selectList(118);">メガゲンガー</li>
+        <li id="dmList0_119" value=119 name="いわーく" onmousedown="MDMC.selectList(119);">イワーク</li>
+        <li id="dmList0_120" value=120 name="すりーぷ" onmousedown="MDMC.selectList(120);">スリープ</li>
+        <li id="dmList0_121" value=121 name="すりーぱー" onmousedown="MDMC.selectList(121);">スリーパー</li>
+        <li id="dmList0_122" value=122 name="くらぶ" onmousedown="MDMC.selectList(122);">クラブ</li>
+        <li id="dmList0_123" value=123 name="きんぐらー" onmousedown="MDMC.selectList(123);">キングラー</li>
+        <li id="dmList0_124" value=124 name="びりりだま" onmousedown="MDMC.selectList(124);">ビリリダマ</li>
+        <li id="dmList0_125" value=125 name="まるまいん" onmousedown="MDMC.selectList(125);">マルマイン</li>
+        <li id="dmList0_126" value=126 name="たまたま" onmousedown="MDMC.selectList(126);">タマタマ</li>
+        <li id="dmList0_127" value=127 name="なっしー" onmousedown="MDMC.selectList(127);">ナッシー</li>
+        <li id="dmList0_128" value=128 name="なっしーA" onmousedown="MDMC.selectList(128);">ナッシーA</li>
+        <li id="dmList0_129" value=129 name="からから" onmousedown="MDMC.selectList(129);">カラカラ</li>
+        <li id="dmList0_130" value=130 name="がらがら" onmousedown="MDMC.selectList(130);">ガラガラ</li>
+        <li id="dmList0_131" value=131 name="がらがらA" onmousedown="MDMC.selectList(131);">ガラガラA</li>
+        <li id="dmList0_132" value=132 name="さわむらー" onmousedown="MDMC.selectList(132);">サワムラー</li>
+        <li id="dmList0_133" value=133 name="えびわらー" onmousedown="MDMC.selectList(133);">エビワラー</li>
+        <li id="dmList0_134" value=134 name="べろりんが" onmousedown="MDMC.selectList(134);">ベロリンガ</li>
+        <li id="dmList0_135" value=135 name="どがーす" onmousedown="MDMC.selectList(135);">ドガース</li>
+        <li id="dmList0_136" value=136 name="またどがす" onmousedown="MDMC.selectList(136);">マタドガス</li>
+        <li id="dmList0_137" value=137 name="さいほーん" onmousedown="MDMC.selectList(137);">サイホーン</li>
+        <li id="dmList0_138" value=138 name="さいどん" onmousedown="MDMC.selectList(138);">サイドン</li>
+        <li id="dmList0_139" value=139 name="らっきー" onmousedown="MDMC.selectList(139);">ラッキー</li>
+        <li id="dmList0_140" value=140 name="もんじゃら" onmousedown="MDMC.selectList(140);">モンジャラ</li>
+        <li id="dmList0_141" value=141 name="がるーら" onmousedown="MDMC.selectList(141);">ガルーラ</li>
+        <li id="dmList0_142" value=142 name="めががるーら" onmousedown="MDMC.selectList(142);">メガガルーラ</li>
+        <li id="dmList0_143" value=143 name="たっつー" onmousedown="MDMC.selectList(143);">タッツー</li>
+        <li id="dmList0_144" value=144 name="しーどら" onmousedown="MDMC.selectList(144);">シードラ</li>
+        <li id="dmList0_145" value=145 name="とさきんと" onmousedown="MDMC.selectList(145);">トサキント</li>
+        <li id="dmList0_146" value=146 name="あずまおう" onmousedown="MDMC.selectList(146);">アズマオウ</li>
+        <li id="dmList0_147" value=147 name="ひとでまん" onmousedown="MDMC.selectList(147);">ヒトデマン</li>
+        <li id="dmList0_148" value=148 name="すたーみー" onmousedown="MDMC.selectList(148);">スターミー</li>
+        <li id="dmList0_149" value=149 name="ばりやーど" onmousedown="MDMC.selectList(149);">バリヤード</li>
+        <li id="dmList0_150" value=150 name="すとらいく" onmousedown="MDMC.selectList(150);">ストライク</li>
+        <li id="dmList0_151" value=151 name="るーじゅら" onmousedown="MDMC.selectList(151);">ルージュラ</li>
+        <li id="dmList0_152" value=152 name="えれぶー" onmousedown="MDMC.selectList(152);">エレブー</li>
+        <li id="dmList0_153" value=153 name="ぶーばー" onmousedown="MDMC.selectList(153);">ブーバー</li>
+        <li id="dmList0_154" value=154 name="かいろす" onmousedown="MDMC.selectList(154);">カイロス</li>
+        <li id="dmList0_155" value=155 name="めがかいろす" onmousedown="MDMC.selectList(155);">メガカイロス</li>
+        <li id="dmList0_156" value=156 name="けんたろす" onmousedown="MDMC.selectList(156);">ケンタロス</li>
+        <li id="dmList0_157" value=157 name="こいきんぐ" onmousedown="MDMC.selectList(157);">コイキング</li>
+        <li id="dmList0_158" value=158 name="ぎゃらどす" onmousedown="MDMC.selectList(158);">ギャラドス</li>
+        <li id="dmList0_159" value=159 name="めがぎゃらどす" onmousedown="MDMC.selectList(159);">メガギャラドス</li>
+        <li id="dmList0_160" value=160 name="らぷらす" onmousedown="MDMC.selectList(160);">ラプラス</li>
+        <li id="dmList0_161" value=161 name="めたもん" onmousedown="MDMC.selectList(161);">メタモン</li>
+        <li id="dmList0_162" value=162 name="いーぶい" onmousedown="MDMC.selectList(162);">イーブイ</li>
+        <li id="dmList0_163" value=163 name="しゃわーず" onmousedown="MDMC.selectList(163);">シャワーズ</li>
+        <li id="dmList0_164" value=164 name="さんだーす" onmousedown="MDMC.selectList(164);">サンダース</li>
+        <li id="dmList0_165" value=165 name="ぶーすたー" onmousedown="MDMC.selectList(165);">ブースター</li>
+        <li id="dmList0_166" value=166 name="ぽりごん" onmousedown="MDMC.selectList(166);">ポリゴン</li>
+        <li id="dmList0_167" value=167 name="おむないと" onmousedown="MDMC.selectList(167);">オムナイト</li>
+        <li id="dmList0_168" value=168 name="おむすたー" onmousedown="MDMC.selectList(168);">オムスター</li>
+        <li id="dmList0_169" value=169 name="かぶと" onmousedown="MDMC.selectList(169);">カブト</li>
+        <li id="dmList0_170" value=170 name="かぶとぷす" onmousedown="MDMC.selectList(170);">カブトプス</li>
+        <li id="dmList0_171" value=171 name="ぷてら" onmousedown="MDMC.selectList(171);">プテラ</li>
+        <li id="dmList0_172" value=172 name="めがぷてら" onmousedown="MDMC.selectList(172);">メガプテラ</li>
+        <li id="dmList0_173" value=173 name="かびごん" onmousedown="MDMC.selectList(173);">カビゴン</li>
+        <li id="dmList0_174" value=174 name="ふりーざー" onmousedown="MDMC.selectList(174);">フリーザー</li>
+        <li id="dmList0_175" value=175 name="さんだー" onmousedown="MDMC.selectList(175);">サンダー</li>
+        <li id="dmList0_176" value=176 name="ふぁいやー" onmousedown="MDMC.selectList(176);">ファイヤー</li>
+        <li id="dmList0_177" value=177 name="みにりゅう" onmousedown="MDMC.selectList(177);">ミニリュウ</li>
+        <li id="dmList0_178" value=178 name="はくりゅー" onmousedown="MDMC.selectList(178);">ハクリュー</li>
+        <li id="dmList0_179" value=179 name="かいりゅー" onmousedown="MDMC.selectList(179);">カイリュー</li>
+        <li id="dmList0_180" value=180 name="みゅうつー" onmousedown="MDMC.selectList(180);">ミュウツー</li>
+        <li id="dmList0_181" value=181 name="めがみゅうつーX" onmousedown="MDMC.selectList(181);">メガミュウツーX</li>
+        <li id="dmList0_182" value=182 name="めがみゅうつーY" onmousedown="MDMC.selectList(182);">メガミュウツーY</li>
+        <li id="dmList0_183" value=183 name="みゅう" onmousedown="MDMC.selectList(183);">ミュウ</li>
+        <li id="dmList0_184" value=184 name="ちこりーた" onmousedown="MDMC.selectList(184);">チコリータ</li>
+        <li id="dmList0_185" value=185 name="べいりーふ" onmousedown="MDMC.selectList(185);">ベイリーフ</li>
+        <li id="dmList0_186" value=186 name="めがにうむ" onmousedown="MDMC.selectList(186);">メガニウム</li>
+        <li id="dmList0_187" value=187 name="ひのあらし" onmousedown="MDMC.selectList(187);">ヒノアラシ</li>
+        <li id="dmList0_188" value=188 name="まぐまらし" onmousedown="MDMC.selectList(188);">マグマラシ</li>
+        <li id="dmList0_189" value=189 name="ばくふーん" onmousedown="MDMC.selectList(189);">バクフーン</li>
+        <li id="dmList0_190" value=190 name="わにのこ" onmousedown="MDMC.selectList(190);">ワニノコ</li>
+        <li id="dmList0_191" value=191 name="ありげいつ" onmousedown="MDMC.selectList(191);">アリゲイツ</li>
+        <li id="dmList0_192" value=192 name="おーだいる" onmousedown="MDMC.selectList(192);">オーダイル</li>
+        <li id="dmList0_193" value=193 name="おたち" onmousedown="MDMC.selectList(193);">オタチ</li>
+        <li id="dmList0_194" value=194 name="おおたち" onmousedown="MDMC.selectList(194);">オオタチ</li>
+        <li id="dmList0_195" value=195 name="ほーほー" onmousedown="MDMC.selectList(195);">ホーホー</li>
+        <li id="dmList0_196" value=196 name="よるのずく" onmousedown="MDMC.selectList(196);">ヨルノズク</li>
+        <li id="dmList0_197" value=197 name="れでぃば" onmousedown="MDMC.selectList(197);">レディバ</li>
+        <li id="dmList0_198" value=198 name="れでぃあん" onmousedown="MDMC.selectList(198);">レディアン</li>
+        <li id="dmList0_199" value=199 name="いとまる" onmousedown="MDMC.selectList(199);">イトマル</li>
+        <li id="dmList0_200" value=200 name="ありあどす" onmousedown="MDMC.selectList(200);">アリアドス</li>
+        <li id="dmList0_201" value=201 name="くろばっと" onmousedown="MDMC.selectList(201);">クロバット</li>
+        <li id="dmList0_202" value=202 name="ちょんちー" onmousedown="MDMC.selectList(202);">チョンチー</li>
+        <li id="dmList0_203" value=203 name="らんたーん" onmousedown="MDMC.selectList(203);">ランターン</li>
+        <li id="dmList0_204" value=204 name="ぴちゅー" onmousedown="MDMC.selectList(204);">ピチュー</li>
+        <li id="dmList0_205" value=205 name="ぴぃ" onmousedown="MDMC.selectList(205);">ピィ</li>
+        <li id="dmList0_206" value=206 name="ぷぷりん" onmousedown="MDMC.selectList(206);">ププリン</li>
+        <li id="dmList0_207" value=207 name="とげぴー" onmousedown="MDMC.selectList(207);">トゲピー</li>
+        <li id="dmList0_208" value=208 name="とげちっく" onmousedown="MDMC.selectList(208);">トゲチック</li>
+        <li id="dmList0_209" value=209 name="ねいてぃ" onmousedown="MDMC.selectList(209);">ネイティ</li>
+        <li id="dmList0_210" value=210 name="ねいてぃお" onmousedown="MDMC.selectList(210);">ネイティオ</li>
+        <li id="dmList0_211" value=211 name="めりーぷ" onmousedown="MDMC.selectList(211);">メリープ</li>
+        <li id="dmList0_212" value=212 name="もここ" onmousedown="MDMC.selectList(212);">モココ</li>
+        <li id="dmList0_213" value=213 name="でんりゅう" onmousedown="MDMC.selectList(213);">デンリュウ</li>
+        <li id="dmList0_214" value=214 name="めがでんりゅう" onmousedown="MDMC.selectList(214);">メガデンリュウ</li>
+        <li id="dmList0_215" value=215 name="きれいはな" onmousedown="MDMC.selectList(215);">キレイハナ</li>
+        <li id="dmList0_216" value=216 name="まりる" onmousedown="MDMC.selectList(216);">マリル</li>
+        <li id="dmList0_217" value=217 name="まりるり" onmousedown="MDMC.selectList(217);">マリルリ</li>
+        <li id="dmList0_218" value=218 name="うそっきー" onmousedown="MDMC.selectList(218);">ウソッキー</li>
+        <li id="dmList0_219" value=219 name="にょろとの" onmousedown="MDMC.selectList(219);">ニョロトノ</li>
+        <li id="dmList0_220" value=220 name="はねっこ" onmousedown="MDMC.selectList(220);">ハネッコ</li>
+        <li id="dmList0_221" value=221 name="ぽぽっこ" onmousedown="MDMC.selectList(221);">ポポッコ</li>
+        <li id="dmList0_222" value=222 name="わたっこ" onmousedown="MDMC.selectList(222);">ワタッコ</li>
+        <li id="dmList0_223" value=223 name="えいぱむ" onmousedown="MDMC.selectList(223);">エイパム</li>
+        <li id="dmList0_224" value=224 name="ひまなっつ" onmousedown="MDMC.selectList(224);">ヒマナッツ</li>
+        <li id="dmList0_225" value=225 name="きまわり" onmousedown="MDMC.selectList(225);">キマワリ</li>
+        <li id="dmList0_226" value=226 name="やんやんま" onmousedown="MDMC.selectList(226);">ヤンヤンマ</li>
+        <li id="dmList0_227" value=227 name="うぱー" onmousedown="MDMC.selectList(227);">ウパー</li>
+        <li id="dmList0_228" value=228 name="ぬおー" onmousedown="MDMC.selectList(228);">ヌオー</li>
+        <li id="dmList0_229" value=229 name="えーふぃ" onmousedown="MDMC.selectList(229);">エーフィ</li>
+        <li id="dmList0_230" value=230 name="ぶらっきー" onmousedown="MDMC.selectList(230);">ブラッキー</li>
+        <li id="dmList0_231" value=231 name="やみからす" onmousedown="MDMC.selectList(231);">ヤミカラス</li>
+        <li id="dmList0_232" value=232 name="やどきんぐ" onmousedown="MDMC.selectList(232);">ヤドキング</li>
+        <li id="dmList0_233" value=233 name="むうま" onmousedown="MDMC.selectList(233);">ムウマ</li>
+        <li id="dmList0_234" value=234 name="あんのーん" onmousedown="MDMC.selectList(234);">アンノーン</li>
+        <li id="dmList0_235" value=235 name="そーなんす" onmousedown="MDMC.selectList(235);">ソーナンス</li>
+        <li id="dmList0_236" value=236 name="きりんりき" onmousedown="MDMC.selectList(236);">キリンリキ</li>
+        <li id="dmList0_237" value=237 name="くぬぎだま" onmousedown="MDMC.selectList(237);">クヌギダマ</li>
+        <li id="dmList0_238" value=238 name="ふぉれとす" onmousedown="MDMC.selectList(238);">フォレトス</li>
+        <li id="dmList0_239" value=239 name="のこっち" onmousedown="MDMC.selectList(239);">ノコッチ</li>
+        <li id="dmList0_240" value=240 name="ぐらいがー" onmousedown="MDMC.selectList(240);">グライガー</li>
+        <li id="dmList0_241" value=241 name="はがねーる" onmousedown="MDMC.selectList(241);">ハガネール</li>
+        <li id="dmList0_242" value=242 name="めがはがねーる" onmousedown="MDMC.selectList(242);">メガハガネール</li>
+        <li id="dmList0_243" value=243 name="ぶるー" onmousedown="MDMC.selectList(243);">ブルー</li>
+        <li id="dmList0_244" value=244 name="ぐらんぶる" onmousedown="MDMC.selectList(244);">グランブル</li>
+        <li id="dmList0_245" value=245 name="はりーせん" onmousedown="MDMC.selectList(245);">ハリーセン</li>
+        <li id="dmList0_246" value=246 name="はっさむ" onmousedown="MDMC.selectList(246);">ハッサム</li>
+        <li id="dmList0_247" value=247 name="めがはっさむ" onmousedown="MDMC.selectList(247);">メガハッサム</li>
+        <li id="dmList0_248" value=248 name="つぼつぼ" onmousedown="MDMC.selectList(248);">ツボツボ</li>
+        <li id="dmList0_249" value=249 name="へらくろす" onmousedown="MDMC.selectList(249);">ヘラクロス</li>
+        <li id="dmList0_250" value=250 name="めがへらくろす" onmousedown="MDMC.selectList(250);">メガヘラクロス</li>
+        <li id="dmList0_251" value=251 name="にゅーら" onmousedown="MDMC.selectList(251);">ニューラ</li>
+        <li id="dmList0_252" value=252 name="ひめぐま" onmousedown="MDMC.selectList(252);">ヒメグマ</li>
+        <li id="dmList0_253" value=253 name="りんぐま" onmousedown="MDMC.selectList(253);">リングマ</li>
+        <li id="dmList0_254" value=254 name="まぐまっぐ" onmousedown="MDMC.selectList(254);">マグマッグ</li>
+        <li id="dmList0_255" value=255 name="まぐかるご" onmousedown="MDMC.selectList(255);">マグカルゴ</li>
+        <li id="dmList0_256" value=256 name="うりむー" onmousedown="MDMC.selectList(256);">ウリムー</li>
+        <li id="dmList0_257" value=257 name="いのむー" onmousedown="MDMC.selectList(257);">イノムー</li>
+        <li id="dmList0_258" value=258 name="さにーご" onmousedown="MDMC.selectList(258);">サニーゴ</li>
+        <li id="dmList0_259" value=259 name="てっぽうお" onmousedown="MDMC.selectList(259);">テッポウオ</li>
+        <li id="dmList0_260" value=260 name="おくたん" onmousedown="MDMC.selectList(260);">オクタン</li>
+        <li id="dmList0_261" value=261 name="でりばーど" onmousedown="MDMC.selectList(261);">デリバード</li>
+        <li id="dmList0_262" value=262 name="まんたいん" onmousedown="MDMC.selectList(262);">マンタイン</li>
+        <li id="dmList0_263" value=263 name="えあーむど" onmousedown="MDMC.selectList(263);">エアームド</li>
+        <li id="dmList0_264" value=264 name="でるびる" onmousedown="MDMC.selectList(264);">デルビル</li>
+        <li id="dmList0_265" value=265 name="へるがー" onmousedown="MDMC.selectList(265);">ヘルガー</li>
+        <li id="dmList0_266" value=266 name="めがへるがー" onmousedown="MDMC.selectList(266);">メガヘルガー</li>
+        <li id="dmList0_267" value=267 name="きんぐどら" onmousedown="MDMC.selectList(267);">キングドラ</li>
+        <li id="dmList0_268" value=268 name="ごまぞう" onmousedown="MDMC.selectList(268);">ゴマゾウ</li>
+        <li id="dmList0_269" value=269 name="どんふぁん" onmousedown="MDMC.selectList(269);">ドンファン</li>
+        <li id="dmList0_270" value=270 name="ぽりごん2" onmousedown="MDMC.selectList(270);">ポリゴン2</li>
+        <li id="dmList0_271" value=271 name="おどしし" onmousedown="MDMC.selectList(271);">オドシシ</li>
+        <li id="dmList0_272" value=272 name="どーぶる" onmousedown="MDMC.selectList(272);">ドーブル</li>
+        <li id="dmList0_273" value=273 name="ばるきー" onmousedown="MDMC.selectList(273);">バルキー</li>
+        <li id="dmList0_274" value=274 name="かぽえらー" onmousedown="MDMC.selectList(274);">カポエラー</li>
+        <li id="dmList0_275" value=275 name="むちゅーる" onmousedown="MDMC.selectList(275);">ムチュール</li>
+        <li id="dmList0_276" value=276 name="えれきっど" onmousedown="MDMC.selectList(276);">エレキッド</li>
+        <li id="dmList0_277" value=277 name="ぶびぃ" onmousedown="MDMC.selectList(277);">ブビィ</li>
+        <li id="dmList0_278" value=278 name="みるたんく" onmousedown="MDMC.selectList(278);">ミルタンク</li>
+        <li id="dmList0_279" value=279 name="はぴなす" onmousedown="MDMC.selectList(279);">ハピナス</li>
+        <li id="dmList0_280" value=280 name="らいこう" onmousedown="MDMC.selectList(280);">ライコウ</li>
+        <li id="dmList0_281" value=281 name="えんてい" onmousedown="MDMC.selectList(281);">エンテイ</li>
+        <li id="dmList0_282" value=282 name="すいくん" onmousedown="MDMC.selectList(282);">スイクン</li>
+        <li id="dmList0_283" value=283 name="よーぎらす" onmousedown="MDMC.selectList(283);">ヨーギラス</li>
+        <li id="dmList0_284" value=284 name="さなぎらす" onmousedown="MDMC.selectList(284);">サナギラス</li>
+        <li id="dmList0_285" value=285 name="ばんぎらす" onmousedown="MDMC.selectList(285);">バンギラス</li>
+        <li id="dmList0_286" value=286 name="めがばんぎらす" onmousedown="MDMC.selectList(286);">メガバンギラス</li>
+        <li id="dmList0_287" value=287 name="るぎあ" onmousedown="MDMC.selectList(287);">ルギア</li>
+        <li id="dmList0_288" value=288 name="ほうおう" onmousedown="MDMC.selectList(288);">ホウオウ</li>
+        <li id="dmList0_289" value=289 name="せれびぃ" onmousedown="MDMC.selectList(289);">セレビィ</li>
+        <li id="dmList0_290" value=290 name="きもり" onmousedown="MDMC.selectList(290);">キモリ</li>
+        <li id="dmList0_291" value=291 name="じゅぷとる" onmousedown="MDMC.selectList(291);">ジュプトル</li>
+        <li id="dmList0_292" value=292 name="じゅかいん" onmousedown="MDMC.selectList(292);">ジュカイン</li>
+        <li id="dmList0_293" value=293 name="めがじゅかいん" onmousedown="MDMC.selectList(293);">メガジュカイン</li>
+        <li id="dmList0_294" value=294 name="あちゃも" onmousedown="MDMC.selectList(294);">アチャモ</li>
+        <li id="dmList0_295" value=295 name="わかしゃも" onmousedown="MDMC.selectList(295);">ワカシャモ</li>
+        <li id="dmList0_296" value=296 name="ばしゃーも" onmousedown="MDMC.selectList(296);">バシャーモ</li>
+        <li id="dmList0_297" value=297 name="めがばしゃーも" onmousedown="MDMC.selectList(297);">メガバシャーモ</li>
+        <li id="dmList0_298" value=298 name="みずごろう" onmousedown="MDMC.selectList(298);">ミズゴロウ</li>
+        <li id="dmList0_299" value=299 name="ぬまくろー" onmousedown="MDMC.selectList(299);">ヌマクロー</li>
+        <li id="dmList0_300" value=300 name="らぐらーじ" onmousedown="MDMC.selectList(300);">ラグラージ</li>
+        <li id="dmList0_301" value=301 name="めがらぐらーじ" onmousedown="MDMC.selectList(301);">メガラグラージ</li>
+        <li id="dmList0_302" value=302 name="ぽちえな" onmousedown="MDMC.selectList(302);">ポチエナ</li>
+        <li id="dmList0_303" value=303 name="ぐらえな" onmousedown="MDMC.selectList(303);">グラエナ</li>
+        <li id="dmList0_304" value=304 name="じぐざぐま" onmousedown="MDMC.selectList(304);">ジグザグマ</li>
+        <li id="dmList0_305" value=305 name="まっすぐま" onmousedown="MDMC.selectList(305);">マッスグマ</li>
+        <li id="dmList0_306" value=306 name="けむっそ" onmousedown="MDMC.selectList(306);">ケムッソ</li>
+        <li id="dmList0_307" value=307 name="からさりす" onmousedown="MDMC.selectList(307);">カラサリス</li>
+        <li id="dmList0_308" value=308 name="あげはんと" onmousedown="MDMC.selectList(308);">アゲハント</li>
+        <li id="dmList0_309" value=309 name="まゆるど" onmousedown="MDMC.selectList(309);">マユルド</li>
+        <li id="dmList0_310" value=310 name="どくけいる" onmousedown="MDMC.selectList(310);">ドクケイル</li>
+        <li id="dmList0_311" value=311 name="はすぼー" onmousedown="MDMC.selectList(311);">ハスボー</li>
+        <li id="dmList0_312" value=312 name="はすぶれろ" onmousedown="MDMC.selectList(312);">ハスブレロ</li>
+        <li id="dmList0_313" value=313 name="るんぱっぱ" onmousedown="MDMC.selectList(313);">ルンパッパ</li>
+        <li id="dmList0_314" value=314 name="たねぼー" onmousedown="MDMC.selectList(314);">タネボー</li>
+        <li id="dmList0_315" value=315 name="このはな" onmousedown="MDMC.selectList(315);">コノハナ</li>
+        <li id="dmList0_316" value=316 name="だーてんぐ" onmousedown="MDMC.selectList(316);">ダーテング</li>
+        <li id="dmList0_317" value=317 name="すばめ" onmousedown="MDMC.selectList(317);">スバメ</li>
+        <li id="dmList0_318" value=318 name="おおすばめ" onmousedown="MDMC.selectList(318);">オオスバメ</li>
+        <li id="dmList0_319" value=319 name="きゃもめ" onmousedown="MDMC.selectList(319);">キャモメ</li>
+        <li id="dmList0_320" value=320 name="ぺりっぱー" onmousedown="MDMC.selectList(320);">ペリッパー</li>
+        <li id="dmList0_321" value=321 name="らるとす" onmousedown="MDMC.selectList(321);">ラルトス</li>
+        <li id="dmList0_322" value=322 name="きるりあ" onmousedown="MDMC.selectList(322);">キルリア</li>
+        <li id="dmList0_323" value=323 name="さーないと" onmousedown="MDMC.selectList(323);">サーナイト</li>
+        <li id="dmList0_324" value=324 name="めがさーないと" onmousedown="MDMC.selectList(324);">メガサーナイト</li>
+        <li id="dmList0_325" value=325 name="あめたま" onmousedown="MDMC.selectList(325);">アメタマ</li>
+        <li id="dmList0_326" value=326 name="あめもーす" onmousedown="MDMC.selectList(326);">アメモース</li>
+        <li id="dmList0_327" value=327 name="きのここ" onmousedown="MDMC.selectList(327);">キノココ</li>
+        <li id="dmList0_328" value=328 name="きのがっさ" onmousedown="MDMC.selectList(328);">キノガッサ</li>
+        <li id="dmList0_329" value=329 name="なまけろ" onmousedown="MDMC.selectList(329);">ナマケロ</li>
+        <li id="dmList0_330" value=330 name="やるきもの" onmousedown="MDMC.selectList(330);">ヤルキモノ</li>
+        <li id="dmList0_331" value=331 name="けっきんぐ" onmousedown="MDMC.selectList(331);">ケッキング</li>
+        <li id="dmList0_332" value=332 name="つちにん" onmousedown="MDMC.selectList(332);">ツチニン</li>
+        <li id="dmList0_333" value=333 name="てっかにん" onmousedown="MDMC.selectList(333);">テッカニン</li>
+        <li id="dmList0_334" value=334 name="ぬけにん" onmousedown="MDMC.selectList(334);">ヌケニン</li>
+        <li id="dmList0_335" value=335 name="ごにょにょ" onmousedown="MDMC.selectList(335);">ゴニョニョ</li>
+        <li id="dmList0_336" value=336 name="どごーむ" onmousedown="MDMC.selectList(336);">ドゴーム</li>
+        <li id="dmList0_337" value=337 name="ばくおんぐ" onmousedown="MDMC.selectList(337);">バクオング</li>
+        <li id="dmList0_338" value=338 name="まくのした" onmousedown="MDMC.selectList(338);">マクノシタ</li>
+        <li id="dmList0_339" value=339 name="はりてやま" onmousedown="MDMC.selectList(339);">ハリテヤマ</li>
+        <li id="dmList0_340" value=340 name="るりり" onmousedown="MDMC.selectList(340);">ルリリ</li>
+        <li id="dmList0_341" value=341 name="のずぱす" onmousedown="MDMC.selectList(341);">ノズパス</li>
+        <li id="dmList0_342" value=342 name="えねこ" onmousedown="MDMC.selectList(342);">エネコ</li>
+        <li id="dmList0_343" value=343 name="えねころろ" onmousedown="MDMC.selectList(343);">エネコロロ</li>
+        <li id="dmList0_344" value=344 name="やみらみ" onmousedown="MDMC.selectList(344);">ヤミラミ</li>
+        <li id="dmList0_345" value=345 name="めがやみらみ" onmousedown="MDMC.selectList(345);">メガヤミラミ</li>
+        <li id="dmList0_346" value=346 name="くちーと" onmousedown="MDMC.selectList(346);">クチート</li>
+        <li id="dmList0_347" value=347 name="めがくちーと" onmousedown="MDMC.selectList(347);">メガクチート</li>
+        <li id="dmList0_348" value=348 name="ここどら" onmousedown="MDMC.selectList(348);">ココドラ</li>
+        <li id="dmList0_349" value=349 name="こどら" onmousedown="MDMC.selectList(349);">コドラ</li>
+        <li id="dmList0_350" value=350 name="ぼすごどら" onmousedown="MDMC.selectList(350);">ボスゴドラ</li>
+        <li id="dmList0_351" value=351 name="めがぼすごどら" onmousedown="MDMC.selectList(351);">メガボスゴドラ</li>
+        <li id="dmList0_352" value=352 name="あさなん" onmousedown="MDMC.selectList(352);">アサナン</li>
+        <li id="dmList0_353" value=353 name="ちゃーれむ" onmousedown="MDMC.selectList(353);">チャーレム</li>
+        <li id="dmList0_354" value=354 name="めがちゃーれむ" onmousedown="MDMC.selectList(354);">メガチャーレム</li>
+        <li id="dmList0_355" value=355 name="らくらい" onmousedown="MDMC.selectList(355);">ラクライ</li>
+        <li id="dmList0_356" value=356 name="らいぼると" onmousedown="MDMC.selectList(356);">ライボルト</li>
+        <li id="dmList0_357" value=357 name="めがらいぼると" onmousedown="MDMC.selectList(357);">メガライボルト</li>
+        <li id="dmList0_358" value=358 name="ぷらする" onmousedown="MDMC.selectList(358);">プラスル</li>
+        <li id="dmList0_359" value=359 name="まいなん" onmousedown="MDMC.selectList(359);">マイナン</li>
+        <li id="dmList0_360" value=360 name="ばるびーと" onmousedown="MDMC.selectList(360);">バルビート</li>
+        <li id="dmList0_361" value=361 name="いるみーぜ" onmousedown="MDMC.selectList(361);">イルミーゼ</li>
+        <li id="dmList0_362" value=362 name="ろぜりあ" onmousedown="MDMC.selectList(362);">ロゼリア</li>
+        <li id="dmList0_363" value=363 name="ごくりん" onmousedown="MDMC.selectList(363);">ゴクリン</li>
+        <li id="dmList0_364" value=364 name="まるのーむ" onmousedown="MDMC.selectList(364);">マルノーム</li>
+        <li id="dmList0_365" value=365 name="きばにあ" onmousedown="MDMC.selectList(365);">キバニア</li>
+        <li id="dmList0_366" value=366 name="さめはだー" onmousedown="MDMC.selectList(366);">サメハダー</li>
+        <li id="dmList0_367" value=367 name="めがさめはだー" onmousedown="MDMC.selectList(367);">メガサメハダー</li>
+        <li id="dmList0_368" value=368 name="ほえるこ" onmousedown="MDMC.selectList(368);">ホエルコ</li>
+        <li id="dmList0_369" value=369 name="ほえるおー" onmousedown="MDMC.selectList(369);">ホエルオー</li>
+        <li id="dmList0_370" value=370 name="どんめる" onmousedown="MDMC.selectList(370);">ドンメル</li>
+        <li id="dmList0_371" value=371 name="ばくーだ" onmousedown="MDMC.selectList(371);">バクーダ</li>
+        <li id="dmList0_372" value=372 name="めがばくーだ" onmousedown="MDMC.selectList(372);">メガバクーダ</li>
+        <li id="dmList0_373" value=373 name="こーたす" onmousedown="MDMC.selectList(373);">コータス</li>
+        <li id="dmList0_374" value=374 name="ばねぶー" onmousedown="MDMC.selectList(374);">バネブー</li>
+        <li id="dmList0_375" value=375 name="ぶーぴっぐ" onmousedown="MDMC.selectList(375);">ブーピッグ</li>
+        <li id="dmList0_376" value=376 name="ぱっちーる" onmousedown="MDMC.selectList(376);">パッチール</li>
+        <li id="dmList0_377" value=377 name="なっくらー" onmousedown="MDMC.selectList(377);">ナックラー</li>
+        <li id="dmList0_378" value=378 name="びぶらーば" onmousedown="MDMC.selectList(378);">ビブラーバ</li>
+        <li id="dmList0_379" value=379 name="ふらいごん" onmousedown="MDMC.selectList(379);">フライゴン</li>
+        <li id="dmList0_380" value=380 name="さぼねあ" onmousedown="MDMC.selectList(380);">サボネア</li>
+        <li id="dmList0_381" value=381 name="のくたす" onmousedown="MDMC.selectList(381);">ノクタス</li>
+        <li id="dmList0_382" value=382 name="ちるっと" onmousedown="MDMC.selectList(382);">チルット</li>
+        <li id="dmList0_383" value=383 name="ちるたりす" onmousedown="MDMC.selectList(383);">チルタリス</li>
+        <li id="dmList0_384" value=384 name="めがちるたりす" onmousedown="MDMC.selectList(384);">メガチルタリス</li>
+        <li id="dmList0_385" value=385 name="ざんぐーす" onmousedown="MDMC.selectList(385);">ザングース</li>
+        <li id="dmList0_386" value=386 name="はぶねーく" onmousedown="MDMC.selectList(386);">ハブネーク</li>
+        <li id="dmList0_387" value=387 name="るなとーん" onmousedown="MDMC.selectList(387);">ルナトーン</li>
+        <li id="dmList0_388" value=388 name="そるろっく" onmousedown="MDMC.selectList(388);">ソルロック</li>
+        <li id="dmList0_389" value=389 name="どじょっち" onmousedown="MDMC.selectList(389);">ドジョッチ</li>
+        <li id="dmList0_390" value=390 name="なまずん" onmousedown="MDMC.selectList(390);">ナマズン</li>
+        <li id="dmList0_391" value=391 name="へいがに" onmousedown="MDMC.selectList(391);">ヘイガニ</li>
+        <li id="dmList0_392" value=392 name="しざりがー" onmousedown="MDMC.selectList(392);">シザリガー</li>
+        <li id="dmList0_393" value=393 name="やじろん" onmousedown="MDMC.selectList(393);">ヤジロン</li>
+        <li id="dmList0_394" value=394 name="ねんどーる" onmousedown="MDMC.selectList(394);">ネンドール</li>
+        <li id="dmList0_395" value=395 name="りりーら" onmousedown="MDMC.selectList(395);">リリーラ</li>
+        <li id="dmList0_396" value=396 name="ゆれいどる" onmousedown="MDMC.selectList(396);">ユレイドル</li>
+        <li id="dmList0_397" value=397 name="あのぷす" onmousedown="MDMC.selectList(397);">アノプス</li>
+        <li id="dmList0_398" value=398 name="あーまるど" onmousedown="MDMC.selectList(398);">アーマルド</li>
+        <li id="dmList0_399" value=399 name="ひんばす" onmousedown="MDMC.selectList(399);">ヒンバス</li>
+        <li id="dmList0_400" value=400 name="みろかろす" onmousedown="MDMC.selectList(400);">ミロカロス</li>
+        <li id="dmList0_401" value=401 name="ぽわるん" onmousedown="MDMC.selectList(401);">ポワルン</li>
+        <li id="dmList0_402" value=402 name="ぽわるん晴" onmousedown="MDMC.selectList(402);">ポワルン晴</li>
+        <li id="dmList0_403" value=403 name="ぽわるん雨" onmousedown="MDMC.selectList(403);">ポワルン雨</li>
+        <li id="dmList0_404" value=404 name="ぽわるん雪" onmousedown="MDMC.selectList(404);">ポワルン雪</li>
+        <li id="dmList0_405" value=405 name="かくれおん" onmousedown="MDMC.selectList(405);">カクレオン</li>
+        <li id="dmList0_406" value=406 name="かげぼうず" onmousedown="MDMC.selectList(406);">カゲボウズ</li>
+        <li id="dmList0_407" value=407 name="じゅぺった" onmousedown="MDMC.selectList(407);">ジュペッタ</li>
+        <li id="dmList0_408" value=408 name="めがじゅぺった" onmousedown="MDMC.selectList(408);">メガジュペッタ</li>
+        <li id="dmList0_409" value=409 name="よまわる" onmousedown="MDMC.selectList(409);">ヨマワル</li>
+        <li id="dmList0_410" value=410 name="さまよーる" onmousedown="MDMC.selectList(410);">サマヨール</li>
+        <li id="dmList0_411" value=411 name="とろぴうす" onmousedown="MDMC.selectList(411);">トロピウス</li>
+        <li id="dmList0_412" value=412 name="ちりーん" onmousedown="MDMC.selectList(412);">チリーン</li>
+        <li id="dmList0_413" value=413 name="あぶそる" onmousedown="MDMC.selectList(413);">アブソル</li>
+        <li id="dmList0_414" value=414 name="めがあぶそる" onmousedown="MDMC.selectList(414);">メガアブソル</li>
+        <li id="dmList0_415" value=415 name="そーなの" onmousedown="MDMC.selectList(415);">ソーナノ</li>
+        <li id="dmList0_416" value=416 name="ゆきわらし" onmousedown="MDMC.selectList(416);">ユキワラシ</li>
+        <li id="dmList0_417" value=417 name="おにごーり" onmousedown="MDMC.selectList(417);">オニゴーリ</li>
+        <li id="dmList0_418" value=418 name="めがおにごーり" onmousedown="MDMC.selectList(418);">メガオニゴーリ</li>
+        <li id="dmList0_419" value=419 name="たまざらし" onmousedown="MDMC.selectList(419);">タマザラシ</li>
+        <li id="dmList0_420" value=420 name="とどぐらー" onmousedown="MDMC.selectList(420);">トドグラー</li>
+        <li id="dmList0_421" value=421 name="とどぜるが" onmousedown="MDMC.selectList(421);">トドゼルガ</li>
+        <li id="dmList0_422" value=422 name="ぱーるる" onmousedown="MDMC.selectList(422);">パールル</li>
+        <li id="dmList0_423" value=423 name="はんてーる" onmousedown="MDMC.selectList(423);">ハンテール</li>
+        <li id="dmList0_424" value=424 name="さくらびす" onmousedown="MDMC.selectList(424);">サクラビス</li>
+        <li id="dmList0_425" value=425 name="じーらんす" onmousedown="MDMC.selectList(425);">ジーランス</li>
+        <li id="dmList0_426" value=426 name="らぶかす" onmousedown="MDMC.selectList(426);">ラブカス</li>
+        <li id="dmList0_427" value=427 name="たつべい" onmousedown="MDMC.selectList(427);">タツベイ</li>
+        <li id="dmList0_428" value=428 name="こもるー" onmousedown="MDMC.selectList(428);">コモルー</li>
+        <li id="dmList0_429" value=429 name="ぼーまんだ" onmousedown="MDMC.selectList(429);">ボーマンダ</li>
+        <li id="dmList0_430" value=430 name="めがぼーまんだ" onmousedown="MDMC.selectList(430);">メガボーマンダ</li>
+        <li id="dmList0_431" value=431 name="だんばる" onmousedown="MDMC.selectList(431);">ダンバル</li>
+        <li id="dmList0_432" value=432 name="めたんぐ" onmousedown="MDMC.selectList(432);">メタング</li>
+        <li id="dmList0_433" value=433 name="めたぐろす" onmousedown="MDMC.selectList(433);">メタグロス</li>
+        <li id="dmList0_434" value=434 name="めがめたぐろす" onmousedown="MDMC.selectList(434);">メガメタグロス</li>
+        <li id="dmList0_435" value=435 name="れじろっく" onmousedown="MDMC.selectList(435);">レジロック</li>
+        <li id="dmList0_436" value=436 name="れじあいす" onmousedown="MDMC.selectList(436);">レジアイス</li>
+        <li id="dmList0_437" value=437 name="れじすちる" onmousedown="MDMC.selectList(437);">レジスチル</li>
+        <li id="dmList0_438" value=438 name="らてぃあす" onmousedown="MDMC.selectList(438);">ラティアス</li>
+        <li id="dmList0_439" value=439 name="めがらてぃあす" onmousedown="MDMC.selectList(439);">メガラティアス</li>
+        <li id="dmList0_440" value=440 name="らてぃおす" onmousedown="MDMC.selectList(440);">ラティオス</li>
+        <li id="dmList0_441" value=441 name="めがらてぃおす" onmousedown="MDMC.selectList(441);">メガラティオス</li>
+        <li id="dmList0_442" value=442 name="かいおーが" onmousedown="MDMC.selectList(442);">カイオーガ</li>
+        <li id="dmList0_443" value=443 name="げんしかいおーが" onmousedown="MDMC.selectList(443);">ゲンシカイオーガ</li>
+        <li id="dmList0_444" value=444 name="ぐらーどん" onmousedown="MDMC.selectList(444);">グラードン</li>
+        <li id="dmList0_445" value=445 name="げんしぐらーどん" onmousedown="MDMC.selectList(445);">ゲンシグラードン</li>
+        <li id="dmList0_446" value=446 name="れっくうざ" onmousedown="MDMC.selectList(446);">レックウザ</li>
+        <li id="dmList0_447" value=447 name="めがれっくうざ" onmousedown="MDMC.selectList(447);">メガレックウザ</li>
+        <li id="dmList0_448" value=448 name="じらーち" onmousedown="MDMC.selectList(448);">ジラーチ</li>
+        <li id="dmList0_449" value=449 name="でおきしすN" onmousedown="MDMC.selectList(449);">デオキシスN</li>
+        <li id="dmList0_450" value=450 name="でおきしすA" onmousedown="MDMC.selectList(450);">デオキシスA</li>
+        <li id="dmList0_451" value=451 name="でおきしすD" onmousedown="MDMC.selectList(451);">デオキシスD</li>
+        <li id="dmList0_452" value=452 name="でおきしすS" onmousedown="MDMC.selectList(452);">デオキシスS</li>
+        <li id="dmList0_453" value=453 name="なえとる" onmousedown="MDMC.selectList(453);">ナエトル</li>
+        <li id="dmList0_454" value=454 name="はやしがめ" onmousedown="MDMC.selectList(454);">ハヤシガメ</li>
+        <li id="dmList0_455" value=455 name="どだいとす" onmousedown="MDMC.selectList(455);">ドダイトス</li>
+        <li id="dmList0_456" value=456 name="ひこざる" onmousedown="MDMC.selectList(456);">ヒコザル</li>
+        <li id="dmList0_457" value=457 name="もうかざる" onmousedown="MDMC.selectList(457);">モウカザル</li>
+        <li id="dmList0_458" value=458 name="ごうかざる" onmousedown="MDMC.selectList(458);">ゴウカザル</li>
+        <li id="dmList0_459" value=459 name="ぽっちゃま" onmousedown="MDMC.selectList(459);">ポッチャマ</li>
+        <li id="dmList0_460" value=460 name="ぽったいし" onmousedown="MDMC.selectList(460);">ポッタイシ</li>
+        <li id="dmList0_461" value=461 name="えんぺると" onmousedown="MDMC.selectList(461);">エンペルト</li>
+        <li id="dmList0_462" value=462 name="むっくる" onmousedown="MDMC.selectList(462);">ムックル</li>
+        <li id="dmList0_463" value=463 name="むくばーど" onmousedown="MDMC.selectList(463);">ムクバード</li>
+        <li id="dmList0_464" value=464 name="むくほーく" onmousedown="MDMC.selectList(464);">ムクホーク</li>
+        <li id="dmList0_465" value=465 name="びっぱ" onmousedown="MDMC.selectList(465);">ビッパ</li>
+        <li id="dmList0_466" value=466 name="びーだる" onmousedown="MDMC.selectList(466);">ビーダル</li>
+        <li id="dmList0_467" value=467 name="ころぼーし" onmousedown="MDMC.selectList(467);">コロボーシ</li>
+        <li id="dmList0_468" value=468 name="ころとっく" onmousedown="MDMC.selectList(468);">コロトック</li>
+        <li id="dmList0_469" value=469 name="こりんく" onmousedown="MDMC.selectList(469);">コリンク</li>
+        <li id="dmList0_470" value=470 name="るくしお" onmousedown="MDMC.selectList(470);">ルクシオ</li>
+        <li id="dmList0_471" value=471 name="れんとらー" onmousedown="MDMC.selectList(471);">レントラー</li>
+        <li id="dmList0_472" value=472 name="すぼみー" onmousedown="MDMC.selectList(472);">スボミー</li>
+        <li id="dmList0_473" value=473 name="ろずれいど" onmousedown="MDMC.selectList(473);">ロズレイド</li>
+        <li id="dmList0_474" value=474 name="ずがいどす" onmousedown="MDMC.selectList(474);">ズガイドス</li>
+        <li id="dmList0_475" value=475 name="らむぱるど" onmousedown="MDMC.selectList(475);">ラムパルド</li>
+        <li id="dmList0_476" value=476 name="たてとぷす" onmousedown="MDMC.selectList(476);">タテトプス</li>
+        <li id="dmList0_477" value=477 name="とりでぷす" onmousedown="MDMC.selectList(477);">トリデプス</li>
+        <li id="dmList0_478" value=478 name="みのむっち" onmousedown="MDMC.selectList(478);">ミノムッチ</li>
+        <li id="dmList0_479" value=479 name="みのまだむ草" onmousedown="MDMC.selectList(479);">ミノマダム草</li>
+        <li id="dmList0_480" value=480 name="みのまだむ砂" onmousedown="MDMC.selectList(480);">ミノマダム砂</li>
+        <li id="dmList0_481" value=481 name="みのまだむ塵" onmousedown="MDMC.selectList(481);">ミノマダム塵</li>
+        <li id="dmList0_482" value=482 name="がーめいる" onmousedown="MDMC.selectList(482);">ガーメイル</li>
+        <li id="dmList0_483" value=483 name="みつはにー" onmousedown="MDMC.selectList(483);">ミツハニー</li>
+        <li id="dmList0_484" value=484 name="びーくいん" onmousedown="MDMC.selectList(484);">ビークイン</li>
+        <li id="dmList0_485" value=485 name="ぱちりす" onmousedown="MDMC.selectList(485);">パチリス</li>
+        <li id="dmList0_486" value=486 name="ぶいぜる" onmousedown="MDMC.selectList(486);">ブイゼル</li>
+        <li id="dmList0_487" value=487 name="ふろーぜる" onmousedown="MDMC.selectList(487);">フローゼル</li>
+        <li id="dmList0_488" value=488 name="ちぇりんぼ" onmousedown="MDMC.selectList(488);">チェリンボ</li>
+        <li id="dmList0_489" value=489 name="ちぇりむ" onmousedown="MDMC.selectList(489);">チェリム</li>
+        <li id="dmList0_490" value=490 name="からなくし" onmousedown="MDMC.selectList(490);">カラナクシ</li>
+        <li id="dmList0_491" value=491 name="とりとどん" onmousedown="MDMC.selectList(491);">トリトドン</li>
+        <li id="dmList0_492" value=492 name="えてぼーす" onmousedown="MDMC.selectList(492);">エテボース</li>
+        <li id="dmList0_493" value=493 name="ふわんて" onmousedown="MDMC.selectList(493);">フワンテ</li>
+        <li id="dmList0_494" value=494 name="ふわらいど" onmousedown="MDMC.selectList(494);">フワライド</li>
+        <li id="dmList0_495" value=495 name="みみろる" onmousedown="MDMC.selectList(495);">ミミロル</li>
+        <li id="dmList0_496" value=496 name="みみろっぷ" onmousedown="MDMC.selectList(496);">ミミロップ</li>
+        <li id="dmList0_497" value=497 name="めがみみろっぷ" onmousedown="MDMC.selectList(497);">メガミミロップ</li>
+        <li id="dmList0_498" value=498 name="むうまーじ" onmousedown="MDMC.selectList(498);">ムウマージ</li>
+        <li id="dmList0_499" value=499 name="どんからす" onmousedown="MDMC.selectList(499);">ドンカラス</li>
+        <li id="dmList0_500" value=500 name="にゃるまー" onmousedown="MDMC.selectList(500);">ニャルマー</li>
+        <li id="dmList0_501" value=501 name="ぶにゃっと" onmousedown="MDMC.selectList(501);">ブニャット</li>
+        <li id="dmList0_502" value=502 name="りーしゃん" onmousedown="MDMC.selectList(502);">リーシャン</li>
+        <li id="dmList0_503" value=503 name="すかんぷー" onmousedown="MDMC.selectList(503);">スカンプー</li>
+        <li id="dmList0_504" value=504 name="すかたんく" onmousedown="MDMC.selectList(504);">スカタンク</li>
+        <li id="dmList0_505" value=505 name="どーみらー" onmousedown="MDMC.selectList(505);">ドーミラー</li>
+        <li id="dmList0_506" value=506 name="どーたくん" onmousedown="MDMC.selectList(506);">ドータクン</li>
+        <li id="dmList0_507" value=507 name="うそはち" onmousedown="MDMC.selectList(507);">ウソハチ</li>
+        <li id="dmList0_508" value=508 name="まねね" onmousedown="MDMC.selectList(508);">マネネ</li>
+        <li id="dmList0_509" value=509 name="ぴんぷく" onmousedown="MDMC.selectList(509);">ピンプク</li>
+        <li id="dmList0_510" value=510 name="ぺらっぷ" onmousedown="MDMC.selectList(510);">ペラップ</li>
+        <li id="dmList0_511" value=511 name="みかるげ" onmousedown="MDMC.selectList(511);">ミカルゲ</li>
+        <li id="dmList0_512" value=512 name="ふかまる" onmousedown="MDMC.selectList(512);">フカマル</li>
+        <li id="dmList0_513" value=513 name="がばいと" onmousedown="MDMC.selectList(513);">ガバイト</li>
+        <li id="dmList0_514" value=514 name="がぶりあす" onmousedown="MDMC.selectList(514);">ガブリアス</li>
+        <li id="dmList0_515" value=515 name="めががぶりあす" onmousedown="MDMC.selectList(515);">メガガブリアス</li>
+        <li id="dmList0_516" value=516 name="ごんべ" onmousedown="MDMC.selectList(516);">ゴンベ</li>
+        <li id="dmList0_517" value=517 name="りおる" onmousedown="MDMC.selectList(517);">リオル</li>
+        <li id="dmList0_518" value=518 name="るかりお" onmousedown="MDMC.selectList(518);">ルカリオ</li>
+        <li id="dmList0_519" value=519 name="めがるかりお" onmousedown="MDMC.selectList(519);">メガルカリオ</li>
+        <li id="dmList0_520" value=520 name="ひぽぽたす" onmousedown="MDMC.selectList(520);">ヒポポタス</li>
+        <li id="dmList0_521" value=521 name="かばるどん" onmousedown="MDMC.selectList(521);">カバルドン</li>
+        <li id="dmList0_522" value=522 name="すこるぴ" onmousedown="MDMC.selectList(522);">スコルピ</li>
+        <li id="dmList0_523" value=523 name="どらぴおん" onmousedown="MDMC.selectList(523);">ドラピオン</li>
+        <li id="dmList0_524" value=524 name="ぐれっぐる" onmousedown="MDMC.selectList(524);">グレッグル</li>
+        <li id="dmList0_525" value=525 name="どくろっぐ" onmousedown="MDMC.selectList(525);">ドクロッグ</li>
+        <li id="dmList0_526" value=526 name="ますきっぱ" onmousedown="MDMC.selectList(526);">マスキッパ</li>
+        <li id="dmList0_527" value=527 name="けいこうお" onmousedown="MDMC.selectList(527);">ケイコウオ</li>
+        <li id="dmList0_528" value=528 name="ねおらんと" onmousedown="MDMC.selectList(528);">ネオラント</li>
+        <li id="dmList0_529" value=529 name="たまんた" onmousedown="MDMC.selectList(529);">タマンタ</li>
+        <li id="dmList0_530" value=530 name="ゆきかぶり" onmousedown="MDMC.selectList(530);">ユキカブリ</li>
+        <li id="dmList0_531" value=531 name="ゆきのおー" onmousedown="MDMC.selectList(531);">ユキノオー</li>
+        <li id="dmList0_532" value=532 name="めがゆきのおー" onmousedown="MDMC.selectList(532);">メガユキノオー</li>
+        <li id="dmList0_533" value=533 name="まにゅーら" onmousedown="MDMC.selectList(533);">マニューラ</li>
+        <li id="dmList0_534" value=534 name="じばこいる" onmousedown="MDMC.selectList(534);">ジバコイル</li>
+        <li id="dmList0_535" value=535 name="べろべると" onmousedown="MDMC.selectList(535);">ベロベルト</li>
+        <li id="dmList0_536" value=536 name="どさいどん" onmousedown="MDMC.selectList(536);">ドサイドン</li>
+        <li id="dmList0_537" value=537 name="もじゃんぼ" onmousedown="MDMC.selectList(537);">モジャンボ</li>
+        <li id="dmList0_538" value=538 name="えれきぶる" onmousedown="MDMC.selectList(538);">エレキブル</li>
+        <li id="dmList0_539" value=539 name="ぶーばーん" onmousedown="MDMC.selectList(539);">ブーバーン</li>
+        <li id="dmList0_540" value=540 name="とげきっす" onmousedown="MDMC.selectList(540);">トゲキッス</li>
+        <li id="dmList0_541" value=541 name="めがやんま" onmousedown="MDMC.selectList(541);">メガヤンマ</li>
+        <li id="dmList0_542" value=542 name="りーふぃあ" onmousedown="MDMC.selectList(542);">リーフィア</li>
+        <li id="dmList0_543" value=543 name="ぐれいしあ" onmousedown="MDMC.selectList(543);">グレイシア</li>
+        <li id="dmList0_544" value=544 name="ぐらいおん" onmousedown="MDMC.selectList(544);">グライオン</li>
+        <li id="dmList0_545" value=545 name="まんむー" onmousedown="MDMC.selectList(545);">マンムー</li>
+        <li id="dmList0_546" value=546 name="ぽりごんZ" onmousedown="MDMC.selectList(546);">ポリゴンZ</li>
+        <li id="dmList0_547" value=547 name="えるれいど" onmousedown="MDMC.selectList(547);">エルレイド</li>
+        <li id="dmList0_548" value=548 name="めがえるれいど" onmousedown="MDMC.selectList(548);">メガエルレイド</li>
+        <li id="dmList0_549" value=549 name="だいのーず" onmousedown="MDMC.selectList(549);">ダイノーズ</li>
+        <li id="dmList0_550" value=550 name="よのわーる" onmousedown="MDMC.selectList(550);">ヨノワール</li>
+        <li id="dmList0_551" value=551 name="ゆきめのこ" onmousedown="MDMC.selectList(551);">ユキメノコ</li>
+        <li id="dmList0_552" value=552 name="ろとむ" onmousedown="MDMC.selectList(552);">ロトム</li>
+        <li id="dmList0_553" value=553 name="ろとむ火" onmousedown="MDMC.selectList(553);">ロトム火</li>
+        <li id="dmList0_554" value=554 name="ろとむ水" onmousedown="MDMC.selectList(554);">ロトム水</li>
+        <li id="dmList0_555" value=555 name="ろとむ氷" onmousedown="MDMC.selectList(555);">ロトム氷</li>
+        <li id="dmList0_556" value=556 name="ろとむ飛" onmousedown="MDMC.selectList(556);">ロトム飛</li>
+        <li id="dmList0_557" value=557 name="ろとむ草" onmousedown="MDMC.selectList(557);">ロトム草</li>
+        <li id="dmList0_558" value=558 name="ゆくしー" onmousedown="MDMC.selectList(558);">ユクシー</li>
+        <li id="dmList0_559" value=559 name="えむりっと" onmousedown="MDMC.selectList(559);">エムリット</li>
+        <li id="dmList0_560" value=560 name="あぐのむ" onmousedown="MDMC.selectList(560);">アグノム</li>
+        <li id="dmList0_561" value=561 name="でぃあるが" onmousedown="MDMC.selectList(561);">ディアルガ</li>
+        <li id="dmList0_562" value=562 name="ぱるきあ" onmousedown="MDMC.selectList(562);">パルキア</li>
+        <li id="dmList0_563" value=563 name="ひーどらん" onmousedown="MDMC.selectList(563);">ヒードラン</li>
+        <li id="dmList0_564" value=564 name="れじぎがす" onmousedown="MDMC.selectList(564);">レジギガス</li>
+        <li id="dmList0_565" value=565 name="ぎらてぃなA" onmousedown="MDMC.selectList(565);">ギラティナA</li>
+        <li id="dmList0_566" value=566 name="ぎらてぃなO" onmousedown="MDMC.selectList(566);">ギラティナO</li>
+        <li id="dmList0_567" value=567 name="くれせりあ" onmousedown="MDMC.selectList(567);">クレセリア</li>
+        <li id="dmList0_568" value=568 name="ふぃおね" onmousedown="MDMC.selectList(568);">フィオネ</li>
+        <li id="dmList0_569" value=569 name="まなふぃ" onmousedown="MDMC.selectList(569);">マナフィ</li>
+        <li id="dmList0_570" value=570 name="だーくらい" onmousedown="MDMC.selectList(570);">ダークライ</li>
+        <li id="dmList0_571" value=571 name="しぇいみL" onmousedown="MDMC.selectList(571);">シェイミL</li>
+        <li id="dmList0_572" value=572 name="しぇいみS" onmousedown="MDMC.selectList(572);">シェイミS</li>
+        <li id="dmList0_573" value=573 name="あるせうす" onmousedown="MDMC.selectList(573);">アルセウス</li>
+        <li id="dmList0_574" value=574 name="びくてぃに" onmousedown="MDMC.selectList(574);">ビクティニ</li>
+        <li id="dmList0_575" value=575 name="つたーじゃ" onmousedown="MDMC.selectList(575);">ツタージャ</li>
+        <li id="dmList0_576" value=576 name="じゃのびー" onmousedown="MDMC.selectList(576);">ジャノビー</li>
+        <li id="dmList0_577" value=577 name="じゃろーだ" onmousedown="MDMC.selectList(577);">ジャローダ</li>
+        <li id="dmList0_578" value=578 name="ぽかぶ" onmousedown="MDMC.selectList(578);">ポカブ</li>
+        <li id="dmList0_579" value=579 name="ちゃおぶー" onmousedown="MDMC.selectList(579);">チャオブー</li>
+        <li id="dmList0_580" value=580 name="えんぶおー" onmousedown="MDMC.selectList(580);">エンブオー</li>
+        <li id="dmList0_581" value=581 name="みじゅまる" onmousedown="MDMC.selectList(581);">ミジュマル</li>
+        <li id="dmList0_582" value=582 name="ふたちまる" onmousedown="MDMC.selectList(582);">フタチマル</li>
+        <li id="dmList0_583" value=583 name="だいけんき" onmousedown="MDMC.selectList(583);">ダイケンキ</li>
+        <li id="dmList0_584" value=584 name="みねずみ" onmousedown="MDMC.selectList(584);">ミネズミ</li>
+        <li id="dmList0_585" value=585 name="みるほっぐ" onmousedown="MDMC.selectList(585);">ミルホッグ</li>
+        <li id="dmList0_586" value=586 name="よーてりー" onmousedown="MDMC.selectList(586);">ヨーテリー</li>
+        <li id="dmList0_587" value=587 name="はーでりあ" onmousedown="MDMC.selectList(587);">ハーデリア</li>
+        <li id="dmList0_588" value=588 name="むーらんど" onmousedown="MDMC.selectList(588);">ムーランド</li>
+        <li id="dmList0_589" value=589 name="ちょろねこ" onmousedown="MDMC.selectList(589);">チョロネコ</li>
+        <li id="dmList0_590" value=590 name="れぱるだす" onmousedown="MDMC.selectList(590);">レパルダス</li>
+        <li id="dmList0_591" value=591 name="やなっぷ" onmousedown="MDMC.selectList(591);">ヤナップ</li>
+        <li id="dmList0_592" value=592 name="やなっきー" onmousedown="MDMC.selectList(592);">ヤナッキー</li>
+        <li id="dmList0_593" value=593 name="ばおっぷ" onmousedown="MDMC.selectList(593);">バオップ</li>
+        <li id="dmList0_594" value=594 name="ばおっきー" onmousedown="MDMC.selectList(594);">バオッキー</li>
+        <li id="dmList0_595" value=595 name="ひやっぷ" onmousedown="MDMC.selectList(595);">ヒヤップ</li>
+        <li id="dmList0_596" value=596 name="ひやっきー" onmousedown="MDMC.selectList(596);">ヒヤッキー</li>
+        <li id="dmList0_597" value=597 name="むんな" onmousedown="MDMC.selectList(597);">ムンナ</li>
+        <li id="dmList0_598" value=598 name="むしゃーな" onmousedown="MDMC.selectList(598);">ムシャーナ</li>
+        <li id="dmList0_599" value=599 name="まめぱと" onmousedown="MDMC.selectList(599);">マメパト</li>
+        <li id="dmList0_600" value=600 name="はとーぼー" onmousedown="MDMC.selectList(600);">ハトーボー</li>
+        <li id="dmList0_601" value=601 name="けんほろう" onmousedown="MDMC.selectList(601);">ケンホロウ</li>
+        <li id="dmList0_602" value=602 name="しまま" onmousedown="MDMC.selectList(602);">シママ</li>
+        <li id="dmList0_603" value=603 name="ぜぶらいか" onmousedown="MDMC.selectList(603);">ゼブライカ</li>
+        <li id="dmList0_604" value=604 name="だんごろ" onmousedown="MDMC.selectList(604);">ダンゴロ</li>
+        <li id="dmList0_605" value=605 name="がんとる" onmousedown="MDMC.selectList(605);">ガントル</li>
+        <li id="dmList0_606" value=606 name="ぎがいあす" onmousedown="MDMC.selectList(606);">ギガイアス</li>
+        <li id="dmList0_607" value=607 name="ころもり" onmousedown="MDMC.selectList(607);">コロモリ</li>
+        <li id="dmList0_608" value=608 name="こころもり" onmousedown="MDMC.selectList(608);">ココロモリ</li>
+        <li id="dmList0_609" value=609 name="もぐりゅー" onmousedown="MDMC.selectList(609);">モグリュー</li>
+        <li id="dmList0_610" value=610 name="どりゅうず" onmousedown="MDMC.selectList(610);">ドリュウズ</li>
+        <li id="dmList0_611" value=611 name="たぶんね" onmousedown="MDMC.selectList(611);">タブンネ</li>
+        <li id="dmList0_612" value=612 name="めがたぶんね" onmousedown="MDMC.selectList(612);">メガタブンネ</li>
+        <li id="dmList0_613" value=613 name="どっこらー" onmousedown="MDMC.selectList(613);">ドッコラー</li>
+        <li id="dmList0_614" value=614 name="どてっこつ" onmousedown="MDMC.selectList(614);">ドテッコツ</li>
+        <li id="dmList0_615" value=615 name="ろーぶしん" onmousedown="MDMC.selectList(615);">ローブシン</li>
+        <li id="dmList0_616" value=616 name="おたまろ" onmousedown="MDMC.selectList(616);">オタマロ</li>
+        <li id="dmList0_617" value=617 name="がまがる" onmousedown="MDMC.selectList(617);">ガマガル</li>
+        <li id="dmList0_618" value=618 name="がまげろげ" onmousedown="MDMC.selectList(618);">ガマゲロゲ</li>
+        <li id="dmList0_619" value=619 name="なげき" onmousedown="MDMC.selectList(619);">ナゲキ</li>
+        <li id="dmList0_620" value=620 name="だげき" onmousedown="MDMC.selectList(620);">ダゲキ</li>
+        <li id="dmList0_621" value=621 name="くるみる" onmousedown="MDMC.selectList(621);">クルミル</li>
+        <li id="dmList0_622" value=622 name="くるまゆ" onmousedown="MDMC.selectList(622);">クルマユ</li>
+        <li id="dmList0_623" value=623 name="ははこもり" onmousedown="MDMC.selectList(623);">ハハコモリ</li>
+        <li id="dmList0_624" value=624 name="ふしで" onmousedown="MDMC.selectList(624);">フシデ</li>
+        <li id="dmList0_625" value=625 name="ほいーが" onmousedown="MDMC.selectList(625);">ホイーガ</li>
+        <li id="dmList0_626" value=626 name="ぺんどらー" onmousedown="MDMC.selectList(626);">ペンドラー</li>
+        <li id="dmList0_627" value=627 name="もんめん" onmousedown="MDMC.selectList(627);">モンメン</li>
+        <li id="dmList0_628" value=628 name="えるふーん" onmousedown="MDMC.selectList(628);">エルフーン</li>
+        <li id="dmList0_629" value=629 name="ちゅりね" onmousedown="MDMC.selectList(629);">チュリネ</li>
+        <li id="dmList0_630" value=630 name="どれでぃあ" onmousedown="MDMC.selectList(630);">ドレディア</li>
+        <li id="dmList0_631" value=631 name="ばすらお赤" onmousedown="MDMC.selectList(631);">バスラオ赤</li>
+        <li id="dmList0_632" value=632 name="ばすらお青" onmousedown="MDMC.selectList(632);">バスラオ青</li>
+        <li id="dmList0_633" value=633 name="めぐろこ" onmousedown="MDMC.selectList(633);">メグロコ</li>
+        <li id="dmList0_634" value=634 name="わるびる" onmousedown="MDMC.selectList(634);">ワルビル</li>
+        <li id="dmList0_635" value=635 name="わるびある" onmousedown="MDMC.selectList(635);">ワルビアル</li>
+        <li id="dmList0_636" value=636 name="だるまっか" onmousedown="MDMC.selectList(636);">ダルマッカ</li>
+        <li id="dmList0_637" value=637 name="ひひだるま" onmousedown="MDMC.selectList(637);">ヒヒダルマ</li>
+        <li id="dmList0_638" value=638 name="ひひだるまD" onmousedown="MDMC.selectList(638);">ヒヒダルマD</li>
+        <li id="dmList0_639" value=639 name="まらかっち" onmousedown="MDMC.selectList(639);">マラカッチ</li>
+        <li id="dmList0_640" value=640 name="いしずまい" onmousedown="MDMC.selectList(640);">イシズマイ</li>
+        <li id="dmList0_641" value=641 name="いわぱれす" onmousedown="MDMC.selectList(641);">イワパレス</li>
+        <li id="dmList0_642" value=642 name="ずるっぐ" onmousedown="MDMC.selectList(642);">ズルッグ</li>
+        <li id="dmList0_643" value=643 name="ずるずきん" onmousedown="MDMC.selectList(643);">ズルズキン</li>
+        <li id="dmList0_644" value=644 name="しんぼらー" onmousedown="MDMC.selectList(644);">シンボラー</li>
+        <li id="dmList0_645" value=645 name="ですます" onmousedown="MDMC.selectList(645);">デスマス</li>
+        <li id="dmList0_646" value=646 name="ですかーん" onmousedown="MDMC.selectList(646);">デスカーン</li>
+        <li id="dmList0_647" value=647 name="ぷろとーが" onmousedown="MDMC.selectList(647);">プロトーガ</li>
+        <li id="dmList0_648" value=648 name="あばごーら" onmousedown="MDMC.selectList(648);">アバゴーラ</li>
+        <li id="dmList0_649" value=649 name="あーけん" onmousedown="MDMC.selectList(649);">アーケン</li>
+        <li id="dmList0_650" value=650 name="あーけおす" onmousedown="MDMC.selectList(650);">アーケオス</li>
+        <li id="dmList0_651" value=651 name="やぶくろん" onmousedown="MDMC.selectList(651);">ヤブクロン</li>
+        <li id="dmList0_652" value=652 name="だすとだす" onmousedown="MDMC.selectList(652);">ダストダス</li>
+        <li id="dmList0_653" value=653 name="ぞろあ" onmousedown="MDMC.selectList(653);">ゾロア</li>
+        <li id="dmList0_654" value=654 name="ぞろあーく" onmousedown="MDMC.selectList(654);">ゾロアーク</li>
+        <li id="dmList0_655" value=655 name="ちらーみぃ" onmousedown="MDMC.selectList(655);">チラーミィ</li>
+        <li id="dmList0_656" value=656 name="ちらちーの" onmousedown="MDMC.selectList(656);">チラチーノ</li>
+        <li id="dmList0_657" value=657 name="ごちむ" onmousedown="MDMC.selectList(657);">ゴチム</li>
+        <li id="dmList0_658" value=658 name="ごちみる" onmousedown="MDMC.selectList(658);">ゴチミル</li>
+        <li id="dmList0_659" value=659 name="ごちるぜる" onmousedown="MDMC.selectList(659);">ゴチルゼル</li>
+        <li id="dmList0_660" value=660 name="ゆにらん" onmousedown="MDMC.selectList(660);">ユニラン</li>
+        <li id="dmList0_661" value=661 name="だぶらん" onmousedown="MDMC.selectList(661);">ダブラン</li>
+        <li id="dmList0_662" value=662 name="らんくるす" onmousedown="MDMC.selectList(662);">ランクルス</li>
+        <li id="dmList0_663" value=663 name="こあるひー" onmousedown="MDMC.selectList(663);">コアルヒー</li>
+        <li id="dmList0_664" value=664 name="すわんな" onmousedown="MDMC.selectList(664);">スワンナ</li>
+        <li id="dmList0_665" value=665 name="ばにぷっち" onmousedown="MDMC.selectList(665);">バニプッチ</li>
+        <li id="dmList0_666" value=666 name="ばにりっち" onmousedown="MDMC.selectList(666);">バニリッチ</li>
+        <li id="dmList0_667" value=667 name="ばいばにら" onmousedown="MDMC.selectList(667);">バイバニラ</li>
+        <li id="dmList0_668" value=668 name="しきじか" onmousedown="MDMC.selectList(668);">シキジカ</li>
+        <li id="dmList0_669" value=669 name="めぶきじか" onmousedown="MDMC.selectList(669);">メブキジカ</li>
+        <li id="dmList0_670" value=670 name="えもんが" onmousedown="MDMC.selectList(670);">エモンガ</li>
+        <li id="dmList0_671" value=671 name="かぶるも" onmousedown="MDMC.selectList(671);">カブルモ</li>
+        <li id="dmList0_672" value=672 name="しゅばるご" onmousedown="MDMC.selectList(672);">シュバルゴ</li>
+        <li id="dmList0_673" value=673 name="たまげたけ" onmousedown="MDMC.selectList(673);">タマゲタケ</li>
+        <li id="dmList0_674" value=674 name="もろばれる" onmousedown="MDMC.selectList(674);">モロバレル</li>
+        <li id="dmList0_675" value=675 name="ぷるりる" onmousedown="MDMC.selectList(675);">プルリル</li>
+        <li id="dmList0_676" value=676 name="ぶるんげる" onmousedown="MDMC.selectList(676);">ブルンゲル</li>
+        <li id="dmList0_677" value=677 name="ままんぼう" onmousedown="MDMC.selectList(677);">ママンボウ</li>
+        <li id="dmList0_678" value=678 name="ばちゅる" onmousedown="MDMC.selectList(678);">バチュル</li>
+        <li id="dmList0_679" value=679 name="でんちゅら" onmousedown="MDMC.selectList(679);">デンチュラ</li>
+        <li id="dmList0_680" value=680 name="てっしーど" onmousedown="MDMC.selectList(680);">テッシード</li>
+        <li id="dmList0_681" value=681 name="なっとれい" onmousedown="MDMC.selectList(681);">ナットレイ</li>
+        <li id="dmList0_682" value=682 name="ぎある" onmousedown="MDMC.selectList(682);">ギアル</li>
+        <li id="dmList0_683" value=683 name="ぎぎある" onmousedown="MDMC.selectList(683);">ギギアル</li>
+        <li id="dmList0_684" value=684 name="ぎぎぎある" onmousedown="MDMC.selectList(684);">ギギギアル</li>
+        <li id="dmList0_685" value=685 name="しびしらす" onmousedown="MDMC.selectList(685);">シビシラス</li>
+        <li id="dmList0_686" value=686 name="しびびーる" onmousedown="MDMC.selectList(686);">シビビール</li>
+        <li id="dmList0_687" value=687 name="しびるどん" onmousedown="MDMC.selectList(687);">シビルドン</li>
+        <li id="dmList0_688" value=688 name="りぐれー" onmousedown="MDMC.selectList(688);">リグレー</li>
+        <li id="dmList0_689" value=689 name="おーべむ" onmousedown="MDMC.selectList(689);">オーベム</li>
+        <li id="dmList0_690" value=690 name="ひともし" onmousedown="MDMC.selectList(690);">ヒトモシ</li>
+        <li id="dmList0_691" value=691 name="らんぷらー" onmousedown="MDMC.selectList(691);">ランプラー</li>
+        <li id="dmList0_692" value=692 name="しゃんでら" onmousedown="MDMC.selectList(692);">シャンデラ</li>
+        <li id="dmList0_693" value=693 name="きばご" onmousedown="MDMC.selectList(693);">キバゴ</li>
+        <li id="dmList0_694" value=694 name="おのんど" onmousedown="MDMC.selectList(694);">オノンド</li>
+        <li id="dmList0_695" value=695 name="おののくす" onmousedown="MDMC.selectList(695);">オノノクス</li>
+        <li id="dmList0_696" value=696 name="くましゅん" onmousedown="MDMC.selectList(696);">クマシュン</li>
+        <li id="dmList0_697" value=697 name="つんべあー" onmousedown="MDMC.selectList(697);">ツンベアー</li>
+        <li id="dmList0_698" value=698 name="ふりーじお" onmousedown="MDMC.selectList(698);">フリージオ</li>
+        <li id="dmList0_699" value=699 name="ちょぼまき" onmousedown="MDMC.selectList(699);">チョボマキ</li>
+        <li id="dmList0_700" value=700 name="あぎるだー" onmousedown="MDMC.selectList(700);">アギルダー</li>
+        <li id="dmList0_701" value=701 name="まっぎょ" onmousedown="MDMC.selectList(701);">マッギョ</li>
+        <li id="dmList0_702" value=702 name="こじょふー" onmousedown="MDMC.selectList(702);">コジョフー</li>
+        <li id="dmList0_703" value=703 name="こじょんど" onmousedown="MDMC.selectList(703);">コジョンド</li>
+        <li id="dmList0_704" value=704 name="くりむがん" onmousedown="MDMC.selectList(704);">クリムガン</li>
+        <li id="dmList0_705" value=705 name="ごびっと" onmousedown="MDMC.selectList(705);">ゴビット</li>
+        <li id="dmList0_706" value=706 name="ごるーぐ" onmousedown="MDMC.selectList(706);">ゴルーグ</li>
+        <li id="dmList0_707" value=707 name="こまたな" onmousedown="MDMC.selectList(707);">コマタナ</li>
+        <li id="dmList0_708" value=708 name="きりきざん" onmousedown="MDMC.selectList(708);">キリキザン</li>
+        <li id="dmList0_709" value=709 name="ばっふろん" onmousedown="MDMC.selectList(709);">バッフロン</li>
+        <li id="dmList0_710" value=710 name="わしぼん" onmousedown="MDMC.selectList(710);">ワシボン</li>
+        <li id="dmList0_711" value=711 name="うぉーぐる" onmousedown="MDMC.selectList(711);">ウォーグル</li>
+        <li id="dmList0_712" value=712 name="ばるちゃい" onmousedown="MDMC.selectList(712);">バルチャイ</li>
+        <li id="dmList0_713" value=713 name="ばるじーな" onmousedown="MDMC.selectList(713);">バルジーナ</li>
+        <li id="dmList0_714" value=714 name="くいたらん" onmousedown="MDMC.selectList(714);">クイタラン</li>
+        <li id="dmList0_715" value=715 name="あいあんと" onmousedown="MDMC.selectList(715);">アイアント</li>
+        <li id="dmList0_716" value=716 name="ものず" onmousedown="MDMC.selectList(716);">モノズ</li>
+        <li id="dmList0_717" value=717 name="じへっど" onmousedown="MDMC.selectList(717);">ジヘッド</li>
+        <li id="dmList0_718" value=718 name="さざんどら" onmousedown="MDMC.selectList(718);">サザンドラ</li>
+        <li id="dmList0_719" value=719 name="めらるば" onmousedown="MDMC.selectList(719);">メラルバ</li>
+        <li id="dmList0_720" value=720 name="うるがもす" onmousedown="MDMC.selectList(720);">ウルガモス</li>
+        <li id="dmList0_721" value=721 name="こばるおん" onmousedown="MDMC.selectList(721);">コバルオン</li>
+        <li id="dmList0_722" value=722 name="てらきおん" onmousedown="MDMC.selectList(722);">テラキオン</li>
+        <li id="dmList0_723" value=723 name="びりじおん" onmousedown="MDMC.selectList(723);">ビリジオン</li>
+        <li id="dmList0_724" value=724 name="とるねろす化" onmousedown="MDMC.selectList(724);">トルネロス化</li>
+        <li id="dmList0_725" value=725 name="とるねろす霊" onmousedown="MDMC.selectList(725);">トルネロス霊</li>
+        <li id="dmList0_726" value=726 name="ぼるとろす化" onmousedown="MDMC.selectList(726);">ボルトロス化</li>
+        <li id="dmList0_727" value=727 name="ぼるとろす霊" onmousedown="MDMC.selectList(727);">ボルトロス霊</li>
+        <li id="dmList0_728" value=728 name="れしらむ" onmousedown="MDMC.selectList(728);">レシラム</li>
+        <li id="dmList0_729" value=729 name="ぜくろむ" onmousedown="MDMC.selectList(729);">ゼクロム</li>
+        <li id="dmList0_730" value=730 name="らんどろす化" onmousedown="MDMC.selectList(730);">ランドロス化</li>
+        <li id="dmList0_731" value=731 name="らんどろす霊" onmousedown="MDMC.selectList(731);">ランドロス霊</li>
+        <li id="dmList0_732" value=732 name="きゅれむ" onmousedown="MDMC.selectList(732);">キュレム</li>
+        <li id="dmList0_733" value=733 name="きゅれむW" onmousedown="MDMC.selectList(733);">キュレムW</li>
+        <li id="dmList0_734" value=734 name="きゅれむB" onmousedown="MDMC.selectList(734);">キュレムB</li>
+        <li id="dmList0_735" value=735 name="けるでぃお" onmousedown="MDMC.selectList(735);">ケルディオ</li>
+        <li id="dmList0_736" value=736 name="めろえったV" onmousedown="MDMC.selectList(736);">メロエッタV</li>
+        <li id="dmList0_737" value=737 name="めろえったS" onmousedown="MDMC.selectList(737);">メロエッタS</li>
+        <li id="dmList0_738" value=738 name="げのせくと" onmousedown="MDMC.selectList(738);">ゲノセクト</li>
+        <li id="dmList0_739" value=739 name="はりまろん" onmousedown="MDMC.selectList(739);">ハリマロン</li>
+        <li id="dmList0_740" value=740 name="はりぼーぐ" onmousedown="MDMC.selectList(740);">ハリボーグ</li>
+        <li id="dmList0_741" value=741 name="ぶりがろん" onmousedown="MDMC.selectList(741);">ブリガロン</li>
+        <li id="dmList0_742" value=742 name="ふぉっこ" onmousedown="MDMC.selectList(742);">フォッコ</li>
+        <li id="dmList0_743" value=743 name="てーるなー" onmousedown="MDMC.selectList(743);">テールナー</li>
+        <li id="dmList0_744" value=744 name="まふぉくしー" onmousedown="MDMC.selectList(744);">マフォクシー</li>
+        <li id="dmList0_745" value=745 name="けろまつ" onmousedown="MDMC.selectList(745);">ケロマツ</li>
+        <li id="dmList0_746" value=746 name="げこがしら" onmousedown="MDMC.selectList(746);">ゲコガシラ</li>
+        <li id="dmList0_747" value=747 name="げっこうが" onmousedown="MDMC.selectList(747);">ゲッコウガ</li>
+        <li id="dmList0_748" value=748 name="さとしげっこうが" onmousedown="MDMC.selectList(748);">サトシゲッコウガ</li>
+        <li id="dmList0_749" value=749 name="ほるびー" onmousedown="MDMC.selectList(749);">ホルビー</li>
+        <li id="dmList0_750" value=750 name="ほるーど" onmousedown="MDMC.selectList(750);">ホルード</li>
+        <li id="dmList0_751" value=751 name="ややこま" onmousedown="MDMC.selectList(751);">ヤヤコマ</li>
+        <li id="dmList0_752" value=752 name="ひのやこま" onmousedown="MDMC.selectList(752);">ヒノヤコマ</li>
+        <li id="dmList0_753" value=753 name="ふぁいあろー" onmousedown="MDMC.selectList(753);">ファイアロー</li>
+        <li id="dmList0_754" value=754 name="こふきむし" onmousedown="MDMC.selectList(754);">コフキムシ</li>
+        <li id="dmList0_755" value=755 name="こふーらい" onmousedown="MDMC.selectList(755);">コフーライ</li>
+        <li id="dmList0_756" value=756 name="びびよん" onmousedown="MDMC.selectList(756);">ビビヨン</li>
+        <li id="dmList0_757" value=757 name="ししこ" onmousedown="MDMC.selectList(757);">シシコ</li>
+        <li id="dmList0_758" value=758 name="かえんじし" onmousedown="MDMC.selectList(758);">カエンジシ</li>
+        <li id="dmList0_759" value=759 name="ふらべべ" onmousedown="MDMC.selectList(759);">フラベベ</li>
+        <li id="dmList0_760" value=760 name="ふらえって" onmousedown="MDMC.selectList(760);">フラエッテ</li>
+        <li id="dmList0_761" value=761 name="ふらーじぇす" onmousedown="MDMC.selectList(761);">フラージェス</li>
+        <li id="dmList0_762" value=762 name="めぇーくる" onmousedown="MDMC.selectList(762);">メェークル</li>
+        <li id="dmList0_763" value=763 name="ごーごーと" onmousedown="MDMC.selectList(763);">ゴーゴート</li>
+        <li id="dmList0_764" value=764 name="やんちゃむ" onmousedown="MDMC.selectList(764);">ヤンチャム</li>
+        <li id="dmList0_765" value=765 name="ごろんだ" onmousedown="MDMC.selectList(765);">ゴロンダ</li>
+        <li id="dmList0_766" value=766 name="とりみあん" onmousedown="MDMC.selectList(766);">トリミアン</li>
+        <li id="dmList0_767" value=767 name="にゃすぱー" onmousedown="MDMC.selectList(767);">ニャスパー</li>
+        <li id="dmList0_768" value=768 name="にゃおにくす♂" onmousedown="MDMC.selectList(768);">ニャオニクス♂</li>
+        <li id="dmList0_769" value=769 name="にゃおにくす♀" onmousedown="MDMC.selectList(769);">ニャオニクス♀</li>
+        <li id="dmList0_770" value=770 name="ひとつき" onmousedown="MDMC.selectList(770);">ヒトツキ</li>
+        <li id="dmList0_771" value=771 name="にだんぎる" onmousedown="MDMC.selectList(771);">ニダンギル</li>
+        <li id="dmList0_772" value=772 name="ぎるがるど盾" onmousedown="MDMC.selectList(772);">ギルガルド盾</li>
+        <li id="dmList0_773" value=773 name="ぎるがるど剣" onmousedown="MDMC.selectList(773);">ギルガルド剣</li>
+        <li id="dmList0_774" value=774 name="しゅしゅぷ" onmousedown="MDMC.selectList(774);">シュシュプ</li>
+        <li id="dmList0_775" value=775 name="ふれふわん" onmousedown="MDMC.selectList(775);">フレフワン</li>
+        <li id="dmList0_776" value=776 name="ぺろっぱふ" onmousedown="MDMC.selectList(776);">ペロッパフ</li>
+        <li id="dmList0_777" value=777 name="ぺろりーむ" onmousedown="MDMC.selectList(777);">ペロリーム</li>
+        <li id="dmList0_778" value=778 name="まーいーか" onmousedown="MDMC.selectList(778);">マーイーカ</li>
+        <li id="dmList0_779" value=779 name="からまねろ" onmousedown="MDMC.selectList(779);">カラマネロ</li>
+        <li id="dmList0_780" value=780 name="かめてて" onmousedown="MDMC.selectList(780);">カメテテ</li>
+        <li id="dmList0_781" value=781 name="がめのです" onmousedown="MDMC.selectList(781);">ガメノデス</li>
+        <li id="dmList0_782" value=782 name="くずもー" onmousedown="MDMC.selectList(782);">クズモー</li>
+        <li id="dmList0_783" value=783 name="どらみどろ" onmousedown="MDMC.selectList(783);">ドラミドロ</li>
+        <li id="dmList0_784" value=784 name="うでっぽう" onmousedown="MDMC.selectList(784);">ウデッポウ</li>
+        <li id="dmList0_785" value=785 name="ぶろすたー" onmousedown="MDMC.selectList(785);">ブロスター</li>
+        <li id="dmList0_786" value=786 name="えりきてる" onmousedown="MDMC.selectList(786);">エリキテル</li>
+        <li id="dmList0_787" value=787 name="えれざーど" onmousedown="MDMC.selectList(787);">エレザード</li>
+        <li id="dmList0_788" value=788 name="ちごらす" onmousedown="MDMC.selectList(788);">チゴラス</li>
+        <li id="dmList0_789" value=789 name="がちごらす" onmousedown="MDMC.selectList(789);">ガチゴラス</li>
+        <li id="dmList0_790" value=790 name="あまるす" onmousedown="MDMC.selectList(790);">アマルス</li>
+        <li id="dmList0_791" value=791 name="あまるるが" onmousedown="MDMC.selectList(791);">アマルルガ</li>
+        <li id="dmList0_792" value=792 name="にんふぃあ" onmousedown="MDMC.selectList(792);">ニンフィア</li>
+        <li id="dmList0_793" value=793 name="るちゃぶる" onmousedown="MDMC.selectList(793);">ルチャブル</li>
+        <li id="dmList0_794" value=794 name="ででんね" onmousedown="MDMC.selectList(794);">デデンネ</li>
+        <li id="dmList0_795" value=795 name="めれしー" onmousedown="MDMC.selectList(795);">メレシー</li>
+        <li id="dmList0_796" value=796 name="ぬめら" onmousedown="MDMC.selectList(796);">ヌメラ</li>
+        <li id="dmList0_797" value=797 name="ぬめいる" onmousedown="MDMC.selectList(797);">ヌメイル</li>
+        <li id="dmList0_798" value=798 name="ぬめるごん" onmousedown="MDMC.selectList(798);">ヌメルゴン</li>
+        <li id="dmList0_799" value=799 name="くれっふぃ" onmousedown="MDMC.selectList(799);">クレッフィ</li>
+        <li id="dmList0_800" value=800 name="ぼくれー" onmousedown="MDMC.selectList(800);">ボクレー</li>
+        <li id="dmList0_801" value=801 name="おーろっと" onmousedown="MDMC.selectList(801);">オーロット</li>
+        <li id="dmList0_802" value=802 name="ばけっちゃM" onmousedown="MDMC.selectList(802);">バケッチャM</li>
+        <li id="dmList0_803" value=803 name="ばけっちゃS" onmousedown="MDMC.selectList(803);">バケッチャS</li>
+        <li id="dmList0_804" value=804 name="ばけっちゃL" onmousedown="MDMC.selectList(804);">バケッチャL</li>
+        <li id="dmList0_805" value=805 name="ばけっちゃXL" onmousedown="MDMC.selectList(805);">バケッチャXL</li>
+        <li id="dmList0_806" value=806 name="ぱんぷじんM" onmousedown="MDMC.selectList(806);">パンプジンM</li>
+        <li id="dmList0_807" value=807 name="ぱんぷじんS" onmousedown="MDMC.selectList(807);">パンプジンS</li>
+        <li id="dmList0_808" value=808 name="ぱんぷじんL" onmousedown="MDMC.selectList(808);">パンプジンL</li>
+        <li id="dmList0_809" value=809 name="ぱんぷじんXL" onmousedown="MDMC.selectList(809);">パンプジンXL</li>
+        <li id="dmList0_810" value=810 name="かちこーる" onmousedown="MDMC.selectList(810);">カチコール</li>
+        <li id="dmList0_811" value=811 name="くれべーす" onmousedown="MDMC.selectList(811);">クレベース</li>
+        <li id="dmList0_812" value=812 name="おんばっと" onmousedown="MDMC.selectList(812);">オンバット</li>
+        <li id="dmList0_813" value=813 name="おんばーん" onmousedown="MDMC.selectList(813);">オンバーン</li>
+        <li id="dmList0_814" value=814 name="ぜるねあす" onmousedown="MDMC.selectList(814);">ゼルネアス</li>
+        <li id="dmList0_815" value=815 name="いべるたる" onmousedown="MDMC.selectList(815);">イベルタル</li>
+        <li id="dmList0_816" value=816 name="じがるで50" onmousedown="MDMC.selectList(816);">ジガルデ50</li>
+        <li id="dmList0_817" value=817 name="じがるで10" onmousedown="MDMC.selectList(817);">ジガルデ10</li>
+        <li id="dmList0_818" value=818 name="じがるで100" onmousedown="MDMC.selectList(818);">ジガルデ100</li>
+        <li id="dmList0_819" value=819 name="でぃあんしー" onmousedown="MDMC.selectList(819);">ディアンシー</li>
+        <li id="dmList0_820" value=820 name="めがでぃあんしー" onmousedown="MDMC.selectList(820);">メガディアンシー</li>
+        <li id="dmList0_821" value=821 name="ふーぱ戒" onmousedown="MDMC.selectList(821);">フーパ戒</li>
+        <li id="dmList0_822" value=822 name="ふーぱ解" onmousedown="MDMC.selectList(822);">フーパ解</li>
+        <li id="dmList0_823" value=823 name="ぼるけにおん" onmousedown="MDMC.selectList(823);">ボルケニオン</li>
+        <li id="dmList0_824" value=824 name="もくろー" onmousedown="MDMC.selectList(824);">モクロー</li>
+        <li id="dmList0_825" value=825 name="ふくすろー" onmousedown="MDMC.selectList(825);">フクスロー</li>
+        <li id="dmList0_826" value=826 name="じゅないぱー" onmousedown="MDMC.selectList(826);">ジュナイパー</li>
+        <li id="dmList0_827" value=827 name="にゃびー" onmousedown="MDMC.selectList(827);">ニャビー</li>
+        <li id="dmList0_828" value=828 name="にゃひーと" onmousedown="MDMC.selectList(828);">ニャヒート</li>
+        <li id="dmList0_829" value=829 name="がおがえん" onmousedown="MDMC.selectList(829);">ガオガエン</li>
+        <li id="dmList0_830" value=830 name="あしまり" onmousedown="MDMC.selectList(830);">アシマリ</li>
+        <li id="dmList0_831" value=831 name="おしゃまり" onmousedown="MDMC.selectList(831);">オシャマリ</li>
+        <li id="dmList0_832" value=832 name="あしれーぬ" onmousedown="MDMC.selectList(832);">アシレーヌ</li>
+        <li id="dmList0_833" value=833 name="つつけら" onmousedown="MDMC.selectList(833);">ツツケラ</li>
+        <li id="dmList0_834" value=834 name="けららっぱ" onmousedown="MDMC.selectList(834);">ケララッパ</li>
+        <li id="dmList0_835" value=835 name="どでかばし" onmousedown="MDMC.selectList(835);">ドデカバシ</li>
+        <li id="dmList0_836" value=836 name="やんぐーす" onmousedown="MDMC.selectList(836);">ヤングース</li>
+        <li id="dmList0_837" value=837 name="でかぐーす" onmousedown="MDMC.selectList(837);">デカグース</li>
+        <li id="dmList0_838" value=838 name="あごじむし" onmousedown="MDMC.selectList(838);">アゴジムシ</li>
+        <li id="dmList0_839" value=839 name="でんぢむし" onmousedown="MDMC.selectList(839);">デンヂムシ</li>
+        <li id="dmList0_840" value=840 name="くわがのん" onmousedown="MDMC.selectList(840);">クワガノン</li>
+        <li id="dmList0_841" value=841 name="まけんかに" onmousedown="MDMC.selectList(841);">マケンカニ</li>
+        <li id="dmList0_842" value=842 name="けけんかに" onmousedown="MDMC.selectList(842);">ケケンカニ</li>
+        <li id="dmList0_843" value=843 name="おどりどり炎" onmousedown="MDMC.selectList(843);">オドリドリ炎</li>
+        <li id="dmList0_844" value=844 name="おどりどり電" onmousedown="MDMC.selectList(844);">オドリドリ電</li>
+        <li id="dmList0_845" value=845 name="おどりどり超" onmousedown="MDMC.selectList(845);">オドリドリ超</li>
+        <li id="dmList0_846" value=846 name="おどりどり霊" onmousedown="MDMC.selectList(846);">オドリドリ霊</li>
+        <li id="dmList0_847" value=847 name="あぶりー" onmousedown="MDMC.selectList(847);">アブリー</li>
+        <li id="dmList0_848" value=848 name="あぶりぼん" onmousedown="MDMC.selectList(848);">アブリボン</li>
+        <li id="dmList0_849" value=849 name="いわんこ" onmousedown="MDMC.selectList(849);">イワンコ</li>
+        <li id="dmList0_850" value=850 name="るがるがん昼" onmousedown="MDMC.selectList(850);">ルガルガン昼</li>
+        <li id="dmList0_851" value=851 name="るがるがん夜" onmousedown="MDMC.selectList(851);">ルガルガン夜</li>
+        <li id="dmList0_852" value=852 name="るがるがん黄昏" onmousedown="MDMC.selectList(852);">ルガルガン黄昏</li>
+        <li id="dmList0_853" value=853 name="よわし単" onmousedown="MDMC.selectList(853);">ヨワシ単</li>
+        <li id="dmList0_854" value=854 name="よわし群" onmousedown="MDMC.selectList(854);">ヨワシ群</li>
+        <li id="dmList0_855" value=855 name="ひどいで" onmousedown="MDMC.selectList(855);">ヒドイデ</li>
+        <li id="dmList0_856" value=856 name="どひどいで" onmousedown="MDMC.selectList(856);">ドヒドイデ</li>
+        <li id="dmList0_857" value=857 name="どろばんこ" onmousedown="MDMC.selectList(857);">ドロバンコ</li>
+        <li id="dmList0_858" value=858 name="ばんばどろ" onmousedown="MDMC.selectList(858);">バンバドロ</li>
+        <li id="dmList0_859" value=859 name="しずくも" onmousedown="MDMC.selectList(859);">シズクモ</li>
+        <li id="dmList0_860" value=860 name="おにしずくも" onmousedown="MDMC.selectList(860);">オニシズクモ</li>
+        <li id="dmList0_861" value=861 name="かりきり" onmousedown="MDMC.selectList(861);">カリキリ</li>
+        <li id="dmList0_862" value=862 name="ららんてす" onmousedown="MDMC.selectList(862);">ラランテス</li>
+        <li id="dmList0_863" value=863 name="ねましゅ" onmousedown="MDMC.selectList(863);">ネマシュ</li>
+        <li id="dmList0_864" value=864 name="ましぇーど" onmousedown="MDMC.selectList(864);">マシェード</li>
+        <li id="dmList0_865" value=865 name="やとうもり" onmousedown="MDMC.selectList(865);">ヤトウモリ</li>
+        <li id="dmList0_866" value=866 name="えんにゅーと" onmousedown="MDMC.selectList(866);">エンニュート</li>
+        <li id="dmList0_867" value=867 name="ぬいこぐま" onmousedown="MDMC.selectList(867);">ヌイコグマ</li>
+        <li id="dmList0_868" value=868 name="きてるぐま" onmousedown="MDMC.selectList(868);">キテルグマ</li>
+        <li id="dmList0_869" value=869 name="あまかじ" onmousedown="MDMC.selectList(869);">アマカジ</li>
+        <li id="dmList0_870" value=870 name="あままいこ" onmousedown="MDMC.selectList(870);">アママイコ</li>
+        <li id="dmList0_871" value=871 name="あまーじょ" onmousedown="MDMC.selectList(871);">アマージョ</li>
+        <li id="dmList0_872" value=872 name="きゅわわー" onmousedown="MDMC.selectList(872);">キュワワー</li>
+        <li id="dmList0_873" value=873 name="やれゆーたん" onmousedown="MDMC.selectList(873);">ヤレユータン</li>
+        <li id="dmList0_874" value=874 name="なげつけさる" onmousedown="MDMC.selectList(874);">ナゲツケサル</li>
+        <li id="dmList0_875" value=875 name="こそくむし" onmousedown="MDMC.selectList(875);">コソクムシ</li>
+        <li id="dmList0_876" value=876 name="ぐそくむしゃ" onmousedown="MDMC.selectList(876);">グソクムシャ</li>
+        <li id="dmList0_877" value=877 name="すなばぁ" onmousedown="MDMC.selectList(877);">スナバァ</li>
+        <li id="dmList0_878" value=878 name="しろですな" onmousedown="MDMC.selectList(878);">シロデスナ</li>
+        <li id="dmList0_879" value=879 name="なまこぶし" onmousedown="MDMC.selectList(879);">ナマコブシ</li>
+        <li id="dmList0_880" value=880 name="たいぷ:ぬる" onmousedown="MDMC.selectList(880);">タイプ:ヌル</li>
+        <li id="dmList0_881" value=881 name="しるヴぁでぃ" onmousedown="MDMC.selectList(881);">シルヴァディ</li>
+        <li id="dmList0_882" value=882 name="めての星" onmousedown="MDMC.selectList(882);">メテノ星</li>
+        <li id="dmList0_883" value=883 name="めての核" onmousedown="MDMC.selectList(883);">メテノ核</li>
+        <li id="dmList0_884" value=884 name="ねっこあら" onmousedown="MDMC.selectList(884);">ネッコアラ</li>
+        <li id="dmList0_885" value=885 name="ばくがめす" onmousedown="MDMC.selectList(885);">バクガメス</li>
+        <li id="dmList0_886" value=886 name="とげでまる" onmousedown="MDMC.selectList(886);">トゲデマル</li>
+        <li id="dmList0_887" value=887 name="みみっきゅ" onmousedown="MDMC.selectList(887);">ミミッキュ</li>
+        <li id="dmList0_888" value=888 name="はぎぎしり" onmousedown="MDMC.selectList(888);">ハギギシリ</li>
+        <li id="dmList0_889" value=889 name="じじーろん" onmousedown="MDMC.selectList(889);">ジジーロン</li>
+        <li id="dmList0_890" value=890 name="だだりん" onmousedown="MDMC.selectList(890);">ダダリン</li>
+        <li id="dmList0_891" value=891 name="じゃらこ" onmousedown="MDMC.selectList(891);">ジャラコ</li>
+        <li id="dmList0_892" value=892 name="じゃらんご" onmousedown="MDMC.selectList(892);">ジャランゴ</li>
+        <li id="dmList0_893" value=893 name="じゃららんが" onmousedown="MDMC.selectList(893);">ジャラランガ</li>
+        <li id="dmList0_894" value=894 name="かぷ・こけこ" onmousedown="MDMC.selectList(894);">カプ・コケコ</li>
+        <li id="dmList0_895" value=895 name="かぷ・ててふ" onmousedown="MDMC.selectList(895);">カプ・テテフ</li>
+        <li id="dmList0_896" value=896 name="かぷ・ぶるる" onmousedown="MDMC.selectList(896);">カプ・ブルル</li>
+        <li id="dmList0_897" value=897 name="かぷ・れひれ" onmousedown="MDMC.selectList(897);">カプ・レヒレ</li>
+        <li id="dmList0_898" value=898 name="こすもっぐ" onmousedown="MDMC.selectList(898);">コスモッグ</li>
+        <li id="dmList0_899" value=899 name="こすもうむ" onmousedown="MDMC.selectList(899);">コスモウム</li>
+        <li id="dmList0_900" value=900 name="そるがれお" onmousedown="MDMC.selectList(900);">ソルガレオ</li>
+        <li id="dmList0_901" value=901 name="るなあーら" onmousedown="MDMC.selectList(901);">ルナアーラ</li>
+        <li id="dmList0_902" value=902 name="うつろいど" onmousedown="MDMC.selectList(902);">ウツロイド</li>
+        <li id="dmList0_903" value=903 name="まっしぶーん" onmousedown="MDMC.selectList(903);">マッシブーン</li>
+        <li id="dmList0_904" value=904 name="ふぇろーちぇ" onmousedown="MDMC.selectList(904);">フェローチェ</li>
+        <li id="dmList0_905" value=905 name="でんじゅもく" onmousedown="MDMC.selectList(905);">デンジュモク</li>
+        <li id="dmList0_906" value=906 name="てっかぐや" onmousedown="MDMC.selectList(906);">テッカグヤ</li>
+        <li id="dmList0_907" value=907 name="かみつるぎ" onmousedown="MDMC.selectList(907);">カミツルギ</li>
+        <li id="dmList0_908" value=908 name="あくじきんぐ" onmousedown="MDMC.selectList(908);">アクジキング</li>
+        <li id="dmList0_909" value=909 name="ねくろずま" onmousedown="MDMC.selectList(909);">ネクロズマ</li>
+        <li id="dmList0_910" value=910 name="ねくろずま日" onmousedown="MDMC.selectList(910);">ネクロズマ日</li>
+        <li id="dmList0_911" value=911 name="ねくろずま月" onmousedown="MDMC.selectList(911);">ネクロズマ月</li>
+        <li id="dmList0_912" value=912 name="ねくろずまU" onmousedown="MDMC.selectList(912);">ネクロズマU</li>
+        <li id="dmList0_913" value=913 name="まぎあな" onmousedown="MDMC.selectList(913);">マギアナ</li>
+        <li id="dmList0_914" value=914 name="まーしゃどー" onmousedown="MDMC.selectList(914);">マーシャドー</li>
+        <li id="dmList0_915" value=915 name="べべのむ" onmousedown="MDMC.selectList(915);">ベベノム</li>
+        <li id="dmList0_916" value=916 name="あーごよん" onmousedown="MDMC.selectList(916);">アーゴヨン</li>
+        <li id="dmList0_917" value=917 name="つんでつんで" onmousedown="MDMC.selectList(917);">ツンデツンデ</li>
+        <li id="dmList0_918" value=918 name="ずがどーん" onmousedown="MDMC.selectList(918);">ズガドーン</li>
+        <li id="dmList0_919" value=919 name="ぜらおら" onmousedown="MDMC.selectList(919);">ゼラオラ</li>
+        <li id="dmList0_920" value=920 name="めるたん" onmousedown="MDMC.selectList(920);">メルタン</li>
+        <li id="dmList0_921" value=921 name="めるめたる" onmousedown="MDMC.selectList(921);">メルメタル</li>
+        <li id="dmList0_922" value=922 name="ぽにーたG" onmousedown="MDMC.selectList(922);">ポニータG</li>
+        <li id="dmList0_923" value=923 name="ぎゃろっぷG" onmousedown="MDMC.selectList(923);">ギャロップG</li>
+        <li id="dmList0_924" value=924 name="やどらんG" onmousedown="MDMC.selectList(924);">ヤドランG</li>
+        <li id="dmList0_925" value=925 name="やどんG" onmousedown="MDMC.selectList(925);">ヤドンG</li>
+        <li id="dmList0_926" value=926 name="かもねぎG" onmousedown="MDMC.selectList(926);">カモネギG</li>
+        <li id="dmList0_927" value=927 name="またどがすG" onmousedown="MDMC.selectList(927);">マタドガスG</li>
+        <li id="dmList0_928" value=928 name="ばりやーどG" onmousedown="MDMC.selectList(928);">バリヤードG</li>
+        <li id="dmList0_929" value=929 name="ふりーざーG" onmousedown="MDMC.selectList(929);">フリーザーG</li>
+        <li id="dmList0_930" value=930 name="さんだーG" onmousedown="MDMC.selectList(930);">サンダーG</li>
+        <li id="dmList0_931" value=931 name="ふぁいやーG" onmousedown="MDMC.selectList(931);">ファイヤーG</li>
+        <li id="dmList0_932" value=932 name="やどきんぐG" onmousedown="MDMC.selectList(932);">ヤドキングG</li>
+        <li id="dmList0_933" value=933 name="さにーごG" onmousedown="MDMC.selectList(933);">サニーゴG</li>
+        <li id="dmList0_934" value=934 name="じぐざぐまG" onmousedown="MDMC.selectList(934);">ジグザグマG</li>
+        <li id="dmList0_935" value=935 name="まっすぐまG" onmousedown="MDMC.selectList(935);">マッスグマG</li>
+        <li id="dmList0_936" value=936 name="だるまっかG" onmousedown="MDMC.selectList(936);">ダルマッカG</li>
+        <li id="dmList0_937" value=937 name="ひひだるまG" onmousedown="MDMC.selectList(937);">ヒヒダルマG</li>
+        <li id="dmList0_938" value=938 name="ひひだるまGD" onmousedown="MDMC.selectList(938);">ヒヒダルマGD</li>
+        <li id="dmList0_939" value=939 name="ですますG" onmousedown="MDMC.selectList(939);">デスマスG</li>
+        <li id="dmList0_940" value=940 name="まっぎょG" onmousedown="MDMC.selectList(940);">マッギョG</li>
+        <li id="dmList0_941" value=941 name="さるのり" onmousedown="MDMC.selectList(941);">サルノリ</li>
+        <li id="dmList0_942" value=942 name="ばちんきー" onmousedown="MDMC.selectList(942);">バチンキー</li>
+        <li id="dmList0_943" value=943 name="ごりらんだー" onmousedown="MDMC.selectList(943);">ゴリランダー</li>
+        <li id="dmList0_944" value=944 name="ひばにー" onmousedown="MDMC.selectList(944);">ヒバニー</li>
+        <li id="dmList0_945" value=945 name="らびふっと" onmousedown="MDMC.selectList(945);">ラビフット</li>
+        <li id="dmList0_946" value=946 name="えーすばーん" onmousedown="MDMC.selectList(946);">エースバーン</li>
+        <li id="dmList0_947" value=947 name="めっそん" onmousedown="MDMC.selectList(947);">メッソン</li>
+        <li id="dmList0_948" value=948 name="じめれおん" onmousedown="MDMC.selectList(948);">ジメレオン</li>
+        <li id="dmList0_949" value=949 name="いんてれおん" onmousedown="MDMC.selectList(949);">インテレオン</li>
+        <li id="dmList0_950" value=950 name="ほしがりす" onmousedown="MDMC.selectList(950);">ホシガリス</li>
+        <li id="dmList0_951" value=951 name="よくばりす" onmousedown="MDMC.selectList(951);">ヨクバリス</li>
+        <li id="dmList0_952" value=952 name="ここがら" onmousedown="MDMC.selectList(952);">ココガラ</li>
+        <li id="dmList0_953" value=953 name="あおがらす" onmousedown="MDMC.selectList(953);">アオガラス</li>
+        <li id="dmList0_954" value=954 name="あーまーがあ" onmousedown="MDMC.selectList(954);">アーマーガア</li>
+        <li id="dmList0_955" value=955 name="さっちむし" onmousedown="MDMC.selectList(955);">サッチムシ</li>
+        <li id="dmList0_956" value=956 name="れどーむし" onmousedown="MDMC.selectList(956);">レドームシ</li>
+        <li id="dmList0_957" value=957 name="いおるぶ" onmousedown="MDMC.selectList(957);">イオルブ</li>
+        <li id="dmList0_958" value=958 name="くすね" onmousedown="MDMC.selectList(958);">クスネ</li>
+        <li id="dmList0_959" value=959 name="ふぉくすらい" onmousedown="MDMC.selectList(959);">フォクスライ</li>
+        <li id="dmList0_960" value=960 name="ひめんか" onmousedown="MDMC.selectList(960);">ヒメンカ</li>
+        <li id="dmList0_961" value=961 name="わたしらが" onmousedown="MDMC.selectList(961);">ワタシラガ</li>
+        <li id="dmList0_962" value=962 name="うーるー" onmousedown="MDMC.selectList(962);">ウールー</li>
+        <li id="dmList0_963" value=963 name="ばいうーるー" onmousedown="MDMC.selectList(963);">バイウールー</li>
+        <li id="dmList0_964" value=964 name="かむかめ" onmousedown="MDMC.selectList(964);">カムカメ</li>
+        <li id="dmList0_965" value=965 name="かじりがめ" onmousedown="MDMC.selectList(965);">カジリガメ</li>
+        <li id="dmList0_966" value=966 name="わんぱち" onmousedown="MDMC.selectList(966);">ワンパチ</li>
+        <li id="dmList0_967" value=967 name="ぱるすわん" onmousedown="MDMC.selectList(967);">パルスワン</li>
+        <li id="dmList0_968" value=968 name="たんどん" onmousedown="MDMC.selectList(968);">タンドン</li>
+        <li id="dmList0_969" value=969 name="とろっごん" onmousedown="MDMC.selectList(969);">トロッゴン</li>
+        <li id="dmList0_970" value=970 name="せきたんざん" onmousedown="MDMC.selectList(970);">セキタンザン</li>
+        <li id="dmList0_971" value=971 name="かじっちゅ" onmousedown="MDMC.selectList(971);">カジッチュ</li>
+        <li id="dmList0_972" value=972 name="あっぷりゅー" onmousedown="MDMC.selectList(972);">アップリュー</li>
+        <li id="dmList0_973" value=973 name="たるっぷる" onmousedown="MDMC.selectList(973);">タルップル</li>
+        <li id="dmList0_974" value=974 name="すなへび" onmousedown="MDMC.selectList(974);">スナヘビ</li>
+        <li id="dmList0_975" value=975 name="さだいじゃ" onmousedown="MDMC.selectList(975);">サダイジャ</li>
+        <li id="dmList0_976" value=976 name="うっう" onmousedown="MDMC.selectList(976);">ウッウ</li>
+        <li id="dmList0_977" value=977 name="さしかます" onmousedown="MDMC.selectList(977);">サシカマス</li>
+        <li id="dmList0_978" value=978 name="かますじょー" onmousedown="MDMC.selectList(978);">カマスジョー</li>
+        <li id="dmList0_979" value=979 name="えれずん" onmousedown="MDMC.selectList(979);">エレズン</li>
+        <li id="dmList0_980" value=980 name="すとりんだーH" onmousedown="MDMC.selectList(980);">ストリンダーH</li>
+        <li id="dmList0_981" value=981 name="すとりんだーL" onmousedown="MDMC.selectList(981);">ストリンダーL</li>
+        <li id="dmList0_982" value=982 name="やくで" onmousedown="MDMC.selectList(982);">ヤクデ</li>
+        <li id="dmList0_983" value=983 name="まるやくで" onmousedown="MDMC.selectList(983);">マルヤクデ</li>
+        <li id="dmList0_984" value=984 name="たたっこ" onmousedown="MDMC.selectList(984);">タタッコ</li>
+        <li id="dmList0_985" value=985 name="おとすぱす" onmousedown="MDMC.selectList(985);">オトスパス</li>
+        <li id="dmList0_986" value=986 name="やばちゃ" onmousedown="MDMC.selectList(986);">ヤバチャ</li>
+        <li id="dmList0_987" value=987 name="ぽっとです" onmousedown="MDMC.selectList(987);">ポットデス</li>
+        <li id="dmList0_988" value=988 name="みぶりむ" onmousedown="MDMC.selectList(988);">ミブリム</li>
+        <li id="dmList0_989" value=989 name="てぶりむ" onmousedown="MDMC.selectList(989);">テブリム</li>
+        <li id="dmList0_990" value=990 name="ぶりむおん" onmousedown="MDMC.selectList(990);">ブリムオン</li>
+        <li id="dmList0_991" value=991 name="べろばー" onmousedown="MDMC.selectList(991);">ベロバー</li>
+        <li id="dmList0_992" value=992 name="ぎもー" onmousedown="MDMC.selectList(992);">ギモー</li>
+        <li id="dmList0_993" value=993 name="おーろんげ" onmousedown="MDMC.selectList(993);">オーロンゲ</li>
+        <li id="dmList0_994" value=994 name="たちふさぐま" onmousedown="MDMC.selectList(994);">タチフサグマ</li>
+        <li id="dmList0_995" value=995 name="にゃいきんぐ" onmousedown="MDMC.selectList(995);">ニャイキング</li>
+        <li id="dmList0_996" value=996 name="さにごーん" onmousedown="MDMC.selectList(996);">サニゴーン</li>
+        <li id="dmList0_997" value=997 name="ねぎがないと" onmousedown="MDMC.selectList(997);">ネギガナイト</li>
+        <li id="dmList0_998" value=998 name="ばりこおる" onmousedown="MDMC.selectList(998);">バリコオル</li>
+        <li id="dmList0_999" value=999 name="ですばーん" onmousedown="MDMC.selectList(999);">デスバーン</li>
+        <li id="dmList0_1000" value=1000 name="まほみる" onmousedown="MDMC.selectList(1000);">マホミル</li>
+        <li id="dmList0_1001" value=1001 name="まほいっぷ" onmousedown="MDMC.selectList(1001);">マホイップ</li>
+        <li id="dmList0_1002" value=1002 name="たいれーつ" onmousedown="MDMC.selectList(1002);">タイレーツ</li>
+        <li id="dmList0_1003" value=1003 name="ばちんうに" onmousedown="MDMC.selectList(1003);">バチンウニ</li>
+        <li id="dmList0_1004" value=1004 name="ゆきはみ" onmousedown="MDMC.selectList(1004);">ユキハミ</li>
+        <li id="dmList0_1005" value=1005 name="もすのう" onmousedown="MDMC.selectList(1005);">モスノウ</li>
+        <li id="dmList0_1006" value=1006 name="いしへんじん" onmousedown="MDMC.selectList(1006);">イシヘンジン</li>
+        <li id="dmList0_1007" value=1007 name="こおりっぽ氷" onmousedown="MDMC.selectList(1007);">コオリッポ氷</li>
+        <li id="dmList0_1008" value=1008 name="こおりっぽ禿" onmousedown="MDMC.selectList(1008);">コオリッポ禿</li>
+        <li id="dmList0_1009" value=1009 name="いえっさん♀" onmousedown="MDMC.selectList(1009);">イエッサン♀</li>
+        <li id="dmList0_1010" value=1010 name="いえっさん♂" onmousedown="MDMC.selectList(1010);">イエッサン♂</li>
+        <li id="dmList0_1011" value=1011 name="もるぺこ" onmousedown="MDMC.selectList(1011);">モルペコ</li>
+        <li id="dmList0_1012" value=1012 name="ぞうどう" onmousedown="MDMC.selectList(1012);">ゾウドウ</li>
+        <li id="dmList0_1013" value=1013 name="だいおうどう" onmousedown="MDMC.selectList(1013);">ダイオウドウ</li>
+        <li id="dmList0_1014" value=1014 name="ぱっちらごん" onmousedown="MDMC.selectList(1014);">パッチラゴン</li>
+        <li id="dmList0_1015" value=1015 name="ぱっちるどん" onmousedown="MDMC.selectList(1015);">パッチルドン</li>
+        <li id="dmList0_1016" value=1016 name="うおのらごん" onmousedown="MDMC.selectList(1016);">ウオノラゴン</li>
+        <li id="dmList0_1017" value=1017 name="うおちるどん" onmousedown="MDMC.selectList(1017);">ウオチルドン</li>
+        <li id="dmList0_1018" value=1018 name="じゅらるどん" onmousedown="MDMC.selectList(1018);">ジュラルドン</li>
+        <li id="dmList0_1019" value=1019 name="どらめしや" onmousedown="MDMC.selectList(1019);">ドラメシヤ</li>
+        <li id="dmList0_1020" value=1020 name="どろんち" onmousedown="MDMC.selectList(1020);">ドロンチ</li>
+        <li id="dmList0_1021" value=1021 name="どらぱると" onmousedown="MDMC.selectList(1021);">ドラパルト</li>
+        <li id="dmList0_1022" value=1022 name="ざしあん" onmousedown="MDMC.selectList(1022);">ザシアン</li>
+        <li id="dmList0_1023" value=1023 name="ざしあん剣" onmousedown="MDMC.selectList(1023);">ザシアン剣</li>
+        <li id="dmList0_1024" value=1024 name="ざまぜんた" onmousedown="MDMC.selectList(1024);">ザマゼンタ</li>
+        <li id="dmList0_1025" value=1025 name="ざまぜんた盾" onmousedown="MDMC.selectList(1025);">ザマゼンタ盾</li>
+        <li id="dmList0_1026" value=1026 name="むげんだいな" onmousedown="MDMC.selectList(1026);">ムゲンダイナ</li>
+        <li id="dmList0_1027" value=1027 name="むげんだいなDM" onmousedown="MDMC.selectList(1027);">ムゲンダイナDM</li>
+        <li id="dmList0_1028" value=1028 name="だくま" onmousedown="MDMC.selectList(1028);">ダクマ</li>
+        <li id="dmList0_1029" value=1029 name="うーらおす悪" onmousedown="MDMC.selectList(1029);">ウーラオス悪</li>
+        <li id="dmList0_1030" value=1030 name="うーらおす水" onmousedown="MDMC.selectList(1030);">ウーラオス水</li>
+        <li id="dmList0_1031" value=1031 name="ざるーど" onmousedown="MDMC.selectList(1031);">ザルード</li>
+        <li id="dmList0_1032" value=1032 name="れじえれき" onmousedown="MDMC.selectList(1032);">レジエレキ</li>
+        <li id="dmList0_1033" value=1033 name="れじどらご" onmousedown="MDMC.selectList(1033);">レジドラゴ</li>
+        <li id="dmList0_1034" value=1034 name="ぶりざぽす" onmousedown="MDMC.selectList(1034);">ブリザポス</li>
+        <li id="dmList0_1035" value=1035 name="れいすぽす" onmousedown="MDMC.selectList(1035);">レイスポス</li>
+        <li id="dmList0_1036" value=1036 name="ばどれっくす" onmousedown="MDMC.selectList(1036);">バドレックス</li>
+        <li id="dmList0_1037" value=1037 name="ばどれっくす黒" onmousedown="MDMC.selectList(1037);">バドレックス黒</li>
+        <li id="dmList0_1038" value=1038 name="ばどれっくす白" onmousedown="MDMC.selectList(1038);">バドレックス白</li>
+    </ul>
+</div>
+    <script>
+        //以下の2定数はPHPからの出力時にデータベースから動的出力
+        const MDMC_POKEMAX = 1039;
+        const MDMC_MODEALL = 0;
+</script>
+<script src="frontScript.js"></script>
+</body>
+</html>
