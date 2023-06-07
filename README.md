@@ -11,8 +11,8 @@ https://pokedesiaf.com/damage-calculatorm/
 レンタルサーバーにてWordpressサイトの固定ページとして公開
 #### 作業工数
 * 人数：１人
-* 単体ダメージ計算機制作期間：3週間
-* 旧マルチダメージ計算機への更新：2週間
+* [単体ダメージ計算機](https://pokedesiaf.com/damage-calculator/)制作期間：3週間
+* 旧マルチダメージ計算機への機能一新：2週間
 * 最新バージョンへの機能更新：1週間
 
 ## ファイル内容
