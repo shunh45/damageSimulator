@@ -1,5 +1,5 @@
+// 火力補正（補正タイミングと倍率）を記憶するクラス
 const MDMC_Nodes = class{
-    // 補正（補正時と倍率）を記憶するリストのクラス宣言
     constructor(used=0, ID="", faze=0, revice=0, name=""){
         this.used = used; // 有効判定（使用中：1/未使用：0）
         this.ID = ID; // "A00"などのID
@@ -10,14 +10,15 @@ const MDMC_Nodes = class{
 }
 
 const ZERO_DAMAGE = Array(16).fill(0);
+
+// ターンごとのダメージ・状況を記憶するクラス
 const MDMC_Turns = class{
-    // ターンごとのダメージを記憶するクラス宣言
     constructor(
-        used=0,
+        used=false,
         damages=ZERO_DAMAGE,
         damagesC=ZERO_DAMAGE,
         pwr=80,
-        cat=[0,0],
+        cat=[0,false],
         rank=[0,0],
         criticalRank=0,
         continuation=1,
@@ -29,7 +30,7 @@ const MDMC_Turns = class{
         this.damages = damages; // ダメージ配列（最大→最小）
         this.damagesC = damagesC; // 急所ダメージ配列（最大→最小）
         this.pwr = pwr; // 威力
-        this.cat = cat; // 攻撃分類（[攻め分類,受け分類]）
+        this.cat = cat; // 攻撃分類[攻め分類,受け分類の反転判定]（0:物理, 1:特殊）
         this.rank = rank; // 能力ランク
         this.criticalRank = criticalRank; //急所ランク
         this.continuation = continuation; //追加：連続回数
@@ -96,7 +97,7 @@ const inData = {
     levelB : 50, //レベル（id:#dm_in_2_1）
 }
 
-let dmTurns = [new MDMC_Turns(used=1), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns()];
+let dmTurns = [new MDMC_Turns(used=true), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns()];
 let dmTurnNum = 1; //現在の追加済みターン数
 let dmTurnRandlist = [0, 0, 0, 0, 0]; //ターンのダメージ表示（0:通常, 1:乱数表示）
 let dmStatusRef = [[0,0], [0,0]]; //ステータスの表示状況
@@ -147,7 +148,7 @@ const Revices = {
         const ListEND = refList.length;
         let ID, IDbox, IDnum;
         for( let i=0; i<ListEND; i++ ){
-            if( refList[i].used == 0 ) continue;
+            if( refList[i].used == false ) continue;
             ID = refList[i].ID;
             IDbox = ID[0];
             IDnum = +ID.slice(1,3);
@@ -157,52 +158,42 @@ const Revices = {
     },
 }
 
-let ReList = {
-    // 有効補正リストの操作
-    ListMAX : 7, //同時補正の最大数
+// 各ターンの火力補正リストの操作を行う
+const ReList = {
+    ListMAX : 7, // 同時に選択可能な火力補正の最大数
     returnList : function(){
-        //参照リストを返す
+        // 現在表示中のターンに基づいて、参照する火力補正リストを返す
         return dmTurns[openTurn].RL;
     },
     enterList : function(IDname, faze, revice, name="noname"){
-        // リストへの追加
+        // リストへの火力補正の追加
         let refList = this.returnList(); //リスト参照
         const ListEND = refList.length;
         let index;
         // リストの空きを探す
         for( index=0; index<ListEND; index++ ){
-            if( refList[index].used == 0 ) break;
+            if( refList[index].used == false ) break;
         }
         if( index >= this.ListMAX ) return -1;//追加不可
-        // リストにノードを追加
+        // リストに火力補正ノードを追加
         refList[index] = new MDMC_Nodes(1,IDname,faze,revice, name);
         return index;//追加完了
     },
-    isListFull : function(){
-        const refList = this.returnList(); //リスト参照追加修正：消去予定
-        const ListEND = refList.length;
-        if( ListEND < ReList.ListMAX ) return 0;
-        let index;
-        for( index=0; index<ListEND; index++ ){
-            if( refList[index].used == 0 ) break;
-        }
-        return ( index == ListEND );
-    },
     deleteList : function(IDname){
-        // ノードの消去
+        // 火力補正ノードの消去
         let refList = this.returnList(); //リスト参照
-        List = dmTurns[openTurn].RL; //リスト参照
         const ListEND = refList.length;
         let index;
         for( index=0; index<ListEND; index++ ){
             if( refList[index].ID === IDname ) break;
         }
-        if( index == ListEND ) return -1;//リストの状態エラー
-        refList[index].used = 0;
-        return index;//消去完了
+        if( index == ListEND ) return -1; //リストの状態エラー
+        refList[index].used = false;
+        return index; //消去完了
     },
     changeSwiches : function(ID){
-        //対応ボタンの切り替え
+        // 対応する火力補正の制御
+        // 複数の火力補正のうち、一つのみ選択可能な火力補正を制御する
         if( Revices.selected.A[+ID] ) return 0;
         //タイプ系
         if( +ID == -1 ){
@@ -237,7 +228,7 @@ let ReList = {
         return 1;
     },
     pushRevices : function(BOX, ID, faze, revice, name="noname"){
-        //onclick: 補正ボタン
+        // onclick: 火力補正ボタンのクリック時の挙動
         if( openTurn == -1 ) return -1;
         const IDname = BOX + ID;
         const isSelected = Revices.selected[BOX][+ID];
@@ -265,7 +256,7 @@ let ReList = {
         return 1;
     },
     makeCopy(orgTurn){
-        //補正リストのコピーを作成する
+        // ターンごと補正リストのコピーを作成する
         let refList = dmTurns[orgTurn].RL;
         let returnList = [-1];
         const ListEND = refList.length;
@@ -292,7 +283,7 @@ let doCalculate = {
         let rev = 1;
         const ListEND = this.refList.length;
         for( let i=0; i<ListEND; i++ ){
-            if( this.refList[i].used == 0 ) continue;
+            if( this.refList[i].used == false ) continue;
             if( this.refList[i].faze == faze ){
                 rev *= this.refList[i].revice;
                 rev /= 4096;
@@ -522,7 +513,7 @@ let doCalculate = {
         if( refTurn.cat[0] == 0 ){
             //物理
             document.getElementById(ElName + "_c").innerText = "物理";
-            if( refTurn.cat[1] == 1 ){
+            if( refTurn.cat[1] ){
                 //分類反転
                 document.getElementById(ElName + "_cr").style.display = "flex";
                 document.getElementById(ElName + "_cr").innerText = "→特防";
@@ -532,7 +523,7 @@ let doCalculate = {
         }else{
             //特殊
             document.getElementById(ElName + "_c").innerText = "特殊";
-            if( refTurn.cat[1] == 1 ){
+            if( refTurn.cat[1] ){
                 //分類反転
                 document.getElementById(ElName + "_cr").style.display = "flex";
                 document.getElementById(ElName + "_cr").innerText = "→防御";
@@ -564,7 +555,7 @@ let doCalculate = {
         const revsMax = ReList.ListMAX;
         let idNum = 0;
         for ( idNum=0; idNum<listLen; idNum++ ){
-            if( refList[idNum].used == 0 ){
+            if( refList[idNum].used == false ){
                 document.getElementById(ElName + "_" + idNum).style.display = "none";
                 continue;
             }else {
@@ -596,9 +587,8 @@ let doCalculate = {
         if( copyOrg == -1 ){
             //通常追加
             dmTurns[tn] = new MDMC_Turns();
-            dmTurns[tn].used = 1;
-            dmTurns[tn].power = document.getElementById("dm_in_"+(10+tn)+"_20").value;
-            dmTurns[tn].cat = [((inData.catMode==1)? 1:0), 0];
+            dmTurns[tn].used = true;
+            dmTurns[tn].cat = [((inData.catMode==1)? 1:0), false];
             this.makeReList(tn,tn);
             doCalculate.reCalculate(tn); //計算
             //ダメージリストの調整
@@ -1163,7 +1153,7 @@ let doCalculate = {
         //ターンノードの全消去
         const TURNMAX = this.turn;
         for( let i=0; i<TURNMAX; i++ ){
-            this.Turns[i].used = 0;
+            this.Turns[i].used = false;
             document.getElementById("MDMC_tt"+i).style.display = "none";
             document.getElementById("MDMC_ttResult"+i).style.display = "none";
         }
@@ -1696,7 +1686,7 @@ let MDMC = {
             if ( dmTurns[turn].cat[0] == cat ) continue;
             dmTurns[turn].cat[0] ^= 1;
             document.getElementById("MDMC_inrevs" + turn + "_c").innerHTML = (cat == 0)? "物理":"特殊";
-            if ( dmTurns[turn].cat[1] == 1 ){
+            if ( dmTurns[turn].cat[1] ){
                 document.getElementById("MDMC_inrevs" + turn + "_cr").innerHTML = "→" + ((cat == 0)? "特防":"防御");
             } 
         }
@@ -1763,7 +1753,7 @@ let MDMC = {
             document.getElementById("MDMC_inrevs"+openTurn+"_c").innerText = "物理";
         }
         dmTurns[openTurn].cat[0] = cat;
-        if( refTurn.cat[1] == 1 ){
+        if( refTurn.cat[1] ){
             document.getElementById("MDMC_inrevs"+openTurn+"_cr").innerText = "→" + ((cat==0)? "特防":"防御");
         }
         //ステータス表示変更
@@ -1775,14 +1765,14 @@ let MDMC = {
         //onclick:分類判定ボタン
         if( openTurn == -1 ) return -1;
         let refTurn = dmTurns[openTurn];
-        if( refTurn.cat[1] == 1 ){
+        if( refTurn.cat[1] ){
             //反転→通常
-            refTurn.cat[1] = 0;
+            refTurn.cat[1] = false;
             document.getElementById("MDMC_inrevs"+openTurn+"_cr").style.display = "none";
             document.getElementById("dm_button_RLcat_c").style.background = "#ffffff";
         }else{
             //通常→反転
-            refTurn.cat[1] = 1;
+            refTurn.cat[1] = true;
             document.getElementById("MDMC_inrevs"+openTurn+"_cr").style.display = "flex";
             document.getElementById("MDMC_inrevs"+openTurn+"_cr").innerText = "→" + ((refTurn.cat[0]==0)? "特防":"防御");
             document.getElementById("dm_button_RLcat_c").style.background = "#ffC000";
