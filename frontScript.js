@@ -103,42 +103,45 @@ let dmStatusRef = [[0,0], [0,0]]; //ステータスの表示状況
 let openTurn = -1; //現在の変更参照ターン
 const TURN_MAX = 5; //追加できる最大ターン数
 
-let Revices = {
-    // 補正の有効判定
-    isA : Array(MDMC_RNUM[0]).fill(0), //タイプ一致・タイプ相性
-    isB : Array(MDMC_RNUM[1]).fill(0), //環境補正
-    isC : Array(MDMC_RNUM[2]).fill(0), //主補正
-    isD : Array(MDMC_RNUM[3]).fill(0), //×2
-    isE : Array(MDMC_RNUM[4]).fill(0), //×1.5
-    isF : Array(MDMC_RNUM[5]).fill(0), //×1.33
-    isG : Array(MDMC_RNUM[6]).fill(0), //×1.3
-    isH : Array(MDMC_RNUM[7]).fill(0), //×1.25
-    isI : Array(MDMC_RNUM[8]).fill(0), //×1.2
-    isJ : Array(MDMC_RNUM[9]).fill(0), //×1.1
-    isK : Array(MDMC_RNUM[10]).fill(0), //×0.75
-    isL : Array(MDMC_RNUM[11]).fill(0), //×0.67
-    isM : Array(MDMC_RNUM[12]).fill(0), //×0.5
-    isN : Array(MDMC_RNUM[13]).fill(0), //×その他補正
-    isO : Array(MDMC_RNUM[14]).fill(0), //メトロノーム
-    isP : Array(MDMC_RNUM[15]).fill(0), //そうだいしょう
+// 補正リストを開いている間、火力補正の選択データを操作する
+const Revices = {
+    // 火力補正の選択判定（true:選択中, false:未選択）
+    selected : {
+        A : Array(MDMC_RNUM[0]).fill(false), //タイプ一致・タイプ相性
+        B : Array(MDMC_RNUM[1]).fill(false), //環境補正
+        C : Array(MDMC_RNUM[2]).fill(false), //主補正
+        D : Array(MDMC_RNUM[3]).fill(false), //×2
+        E : Array(MDMC_RNUM[4]).fill(false), //×1.5
+        F : Array(MDMC_RNUM[5]).fill(false), //×1.33
+        G : Array(MDMC_RNUM[6]).fill(false), //×1.3
+        H : Array(MDMC_RNUM[7]).fill(false), //×1.25
+        I : Array(MDMC_RNUM[8]).fill(false), //×1.2
+        J : Array(MDMC_RNUM[9]).fill(false), //×1.1
+        K : Array(MDMC_RNUM[10]).fill(false), //×0.75
+        L : Array(MDMC_RNUM[11]).fill(false), //×0.67
+        M : Array(MDMC_RNUM[12]).fill(false), //×0.5
+        N : Array(MDMC_RNUM[13]).fill(false), //×その他補正
+        O : Array(MDMC_RNUM[14]).fill(false), //メトロノーム
+        P : Array(MDMC_RNUM[15]).fill(false), //そうだいしょう
+    },
     recetAll : function(){
-        //有効補正のリセット
-        const BOX = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
-        const ISs = [this.isA, this.isB, this.isC, this.isD, this.isE, this.isF
-            , this.isG, this.isH, this.isI, this.isJ, this.isK, this.isL, this.isM, this.isN, this.isO, this.isP];
-        let ID;
+        // 火力補正のリセット
+        // selectedをすべてfalseにし、UI上でも選択を解除する
+        const Boxes = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"];
         for( let i=0; i<16; i++ ){
+            const Box = Boxes[i];
             for( let j=0; j<MDMC_RNUM[i]; j++ ){
-                if( ISs[i][j] ){
-                    ISs[i][j] = 0;
-                    ID = ((j<10)? "0"+j:j);
-                    document.getElementById("MDMC_Rbt_"+BOX[i]+ID).style.background = "#ffffff";
+                if( this.selected[Box][j] ){
+                    this.selected[Box][j] = false;
+                    const ID = ((j<10)? "0"+j : j);
+                    document.getElementById("MDMC_Rbt_"+Boxes[i]+ID).style.background = "#ffffff";
                 }
             }
         }
     },
     renewRevices: function(turn){
-        //補正リスト開閉時、有効リストの更新を行う
+        // 参照するターンに基づいて火力補正データを更新
+        // 補正リストの開閉にselectedとUI表示の更新を行う
         this.recetAll();
         let refList = dmTurns[turn].RL;
         const ListEND = refList.length;
@@ -148,25 +151,7 @@ let Revices = {
             ID = refList[i].ID;
             IDbox = ID[0];
             IDnum = +ID.slice(1,3);
-            switch( IDbox ){
-                case "A": this.isA[IDnum] = 1; break;
-                case "B": this.isB[IDnum] = 1; break;
-                case "C": this.isC[IDnum] = 1; break;
-                case "D": this.isD[IDnum] = 1; break;
-                case "E": this.isE[IDnum] = 1; break;
-                case "F": this.isF[IDnum] = 1; break;
-                case "G": this.isG[IDnum] = 1; break;
-                case "H": this.isH[IDnum] = 1; break;
-                case "I": this.isI[IDnum] = 1; break;
-                case "J": this.isJ[IDnum] = 1; break;
-                case "K": this.isK[IDnum] = 1; break;
-                case "L": this.isL[IDnum] = 1; break;
-                case "M": this.isM[IDnum] = 1; break;
-                case "N": this.isN[IDnum] = 1; break;
-                case "O": this.isO[IDnum] = 1; break;
-                case "P": this.isP[IDnum] = 1; break;
-                default: MDMC.dmError("補正リスト作成エラー"); break;
-            }
+            this.selected[IDbox][IDnum] = true;
             document.getElementById("MDMC_Rbt_" + ID).style.background = "#ffc000";
         }
     },
@@ -218,12 +203,12 @@ let ReList = {
     },
     changeSwiches : function(ID){
         //対応ボタンの切り替え
-        if( Revices.isA[+ID] ) return 0;
+        if( Revices.selected.A[+ID] ) return 0;
         //タイプ系
         if( +ID == -1 ){
             //テラス適応力
             for( let i=0; i<=2; i++ ){
-                Revices.isA[i] = 0;
+                Revices.selected.A[i] = false;
                 document.getElementById("MDMC_Rbt_A0" + i).style.background = "#ffffff";
                 this.deleteList("A0" + i);
             }
@@ -231,19 +216,19 @@ let ReList = {
             //タイプ一致
             for( let i=0; i<=2; i++ ){
                 if ( i == +ID ) continue;
-                Revices.isA[i] = 0;
+                Revices.selected.A[i] = false;
                 document.getElementById("MDMC_Rbt_A0" + i).style.background = "#ffffff";
                 this.deleteList("A0" + i);
             }
-            Revices.isN[0] = 0;
+            Revices.selected.N[0] = false;
             document.getElementById("MDMC_Rbt_N00").style.background = "#ffffff";
             this.deleteList("N00");
         }else{
             //タイプ相性
             for( let i=3; i<=6; i++ ){
                 if( i==+ID ) continue;
-                if( Revices.isA[i] ){
-                    Revices.isA[i] = 0;
+                if( Revices.selected.A[i] ){
+                    Revices.selected.A[i] = false;
                     document.getElementById("MDMC_Rbt_A0" + i).style.background = "#ffffff";
                     this.deleteList("A0"+i);
                 }
@@ -255,27 +240,8 @@ let ReList = {
         //onclick: 補正ボタン
         if( openTurn == -1 ) return -1;
         const IDname = BOX + ID;
-        let of = 0;
-        switch(BOX){
-            case "A" : of=+Revices.isA[+ID]; break;
-            case "B" : of=+Revices.isB[+ID]; break;
-            case "C" : of=+Revices.isC[+ID]; break;
-            case "D" : of=+Revices.isD[+ID]; break;
-            case "E" : of=+Revices.isE[+ID]; break;
-            case "F" : of=+Revices.isF[+ID]; break;
-            case "G" : of=+Revices.isG[+ID]; break;
-            case "H" : of=+Revices.isH[+ID]; break;
-            case "I" : of=+Revices.isI[+ID]; break;
-            case "J" : of=+Revices.isJ[+ID]; break;
-            case "K" : of=+Revices.isK[+ID]; break;
-            case "L" : of=+Revices.isL[+ID]; break;
-            case "M" : of=+Revices.isM[+ID]; break;
-            case "N" : of=+Revices.isN[+ID]; break;
-            case "O" : of=+Revices.isO[+ID]; break;
-            case "P" : of=+Revices.isP[+ID]; break;
-            default: MDMC.dmError("補正ボタンエラーA"); break;
-        }
-        if( of ){
+        const isSelected = Revices.selected[BOX][+ID];
+        if( isSelected ){
             //オン→オフ
             let index = this.deleteList(IDname);
             document.getElementById("MDMC_Rbt_" + IDname).style.background = "#ffffff";
@@ -294,25 +260,7 @@ let ReList = {
             }
             document.getElementById("MDMC_Rbt_" + IDname).style.background = "#ffc000";
         }
-        switch(BOX){
-            case "A" : Revices.isA[+ID]^=1; break;
-            case "B" : Revices.isB[+ID]^=1; break;
-            case "C" : Revices.isC[+ID]^=1; break;
-            case "D" : Revices.isD[+ID]^=1; break;
-            case "E" : Revices.isE[+ID]^=1; break;
-            case "F" : Revices.isF[+ID]^=1; break;
-            case "G" : Revices.isG[+ID]^=1; break;
-            case "H" : Revices.isH[+ID]^=1; break;
-            case "I" : Revices.isI[+ID]^=1; break;
-            case "J" : Revices.isJ[+ID]^=1; break;
-            case "K" : Revices.isK[+ID]^=1; break;
-            case "L" : Revices.isL[+ID]^=1; break;
-            case "M" : Revices.isM[+ID]^=1; break;
-            case "N" : Revices.isN[+ID]^=1; break;
-            case "O" : Revices.isO[+ID]^=1; break;
-            case "P" : Revices.isP[+ID]^=1; break;
-            default: MDMC.dmError("補正ボタンエラーB"); break;
-        }
+        Revices.selected[BOX][+ID] = !isSelected;
         doCalculate.reCalculate(openTurn); //計算
         return 1;
     },
