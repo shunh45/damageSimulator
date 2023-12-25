@@ -1181,17 +1181,20 @@ const doCalculate = {
     }
 }
 
+// 入力に基づくUI制御とデータの更新
 let MDMC = {
+    // ポケモン名が入力済みかどうか判定する
     setted : {
         pokeA : 0, //入力済み判定
         pokeB : 0, //入力済み判定
     },
-    selectionId : -1,
+    // 現在入力中のテキストボックスを記録
     nowSelecting : {
-        pn : -1,
-        idn : -1
+        pn : -1, // 攻撃側ポケモンor被弾側ポケモン
+        idn : -1 // どのステータスかの参照
     },
     dmError : function(str){
+        // エラー処理
         alert(str+"\n制作者までご連絡いただければ幸いです");
     },
     dmInputLimit : function(pn, idn, min, max){
@@ -1215,7 +1218,6 @@ let MDMC = {
     },
     inputHelp : function(pn){
         //ポケモン名入力候補の表示
-        //const inputText = document.getElementById("dm_in_" + pn + "_0");
         const inputText = document.getElementById("dm_in_" + pn + "_0").value.slice();
         if( inputText === "" ){
             document.getElementById("dmList0").style.display = "none";
@@ -1367,7 +1369,7 @@ let MDMC = {
         }
     },
     setInformation : async function(pn, idn, setId){
-        //変数の代入等
+        // 入力データを適切な変数に保存する
         const select = document.getElementById("dmList" + idn + "_" + setId);
         const textBox = document.getElementById("dm_in_" + pn + "_" + idn);
         switch(idn){
@@ -1452,7 +1454,8 @@ let MDMC = {
         this.killLists();
     },
     selectList : function(setId){
-        //onclick:リスト選択時の実行関数（ポケモン名）
+        // onclick:リスト選択時の実行関数（ポケモン名）
+        // 入力候補からポケモンを選択した時のデータ適用を行う
         this.setInformation(this.nowSelecting.pn, 0, setId);
         this.selectingId = -1;
         this.nowSelecting.pn = -1;
@@ -1461,11 +1464,12 @@ let MDMC = {
         return 0;
     },
     finishSelect : function(pn, idn){
-        //onchange:入力完了関数
+        // onchange:入力完了関数
+        // 入力完了時に、入力内容を確認してテキストボックスの修正とデータの記録を行う
         if( idn != 0 ){
             //数値入力
             const textBox = document.getElementById("dm_in_" + pn + "_" + idn);
-            if( isNaN(textBox.value) || /*textBox.value === "" ||*/ !Number.isInteger(+textBox.value) ){
+            if( isNaN(textBox.value) || !Number.isInteger(+textBox.value) ){
                 // 無効なテキストボックス内の値を補完し、数値更新を行わない
                 switch(idn){
                     case 1: //レベル
@@ -1559,7 +1563,8 @@ let MDMC = {
         this.killLists();
     },
     dmInput : function(pn, idn){
-        //oninput:入力途中関数
+        // oninput:入力途中関数
+        // 入力状況を監視して、範囲外の数値を修正する
         MDMC.nowSelecting.pn = pn;
         MDMC.nowSelecting.idn = idn;
         switch(idn){
@@ -1589,7 +1594,7 @@ let MDMC = {
         }
     },
     dmOpenRev : function(idn){
-        //補正リストを開く
+        // ターンの詳細設定画面を開く
         openTurn = idn;
         const refTurn = dmTurns[idn];
         const TURN_CARD = document.getElementById("MDMC_tt" + idn);
@@ -1597,7 +1602,7 @@ let MDMC = {
         const PARENT_ID = document.getElementById("MDMC_RLpage");
         PARENT_ID.style.display = "flex";
         PARENT_ID.insertBefore(TURN_CARD, BASE_ID);
-        //補正リストの調整
+        //補正リストの内容を参照ターンのものに更新する
         Revices.renewRevices(idn);
         //ランク
         let ranks;
@@ -1649,6 +1654,7 @@ let MDMC = {
         }
     },
     dmCloseRev : function(){
+        // ターンの詳細設定画面を閉じる
         const idn = +openTurn;
         const TURN_CARD = document.getElementById("MDMC_tt" + idn);
         const PARENT_ID = document.getElementById("MDMC_ttBox");
@@ -1656,10 +1662,9 @@ let MDMC = {
         PARENT_ID.insertBefore(TURN_CARD, NEXT_ID);
         document.getElementById("MDMC_RLpage").style.display = "none";
         openTurn = -1;
-        //追加修正：瀕死率計算の実行:いらない？
     },
     changeStatusCat : function(){
-        //状況に応じてステータス表示を変更する
+        // 状況に応じてステータス表示を変更する
         let nowCat = inData.catMode;
         if ( nowCat == 2 ) return 1;
         let catStatus = [[0, 0], [0, 0]];
@@ -1697,7 +1702,7 @@ let MDMC = {
         return 0;
     },
     changeCatForce : function(cat){
-        //全ての技の分類をどちらかに変える
+        //全ての技の分類をどちらかに上書きする
         if ( cat == 2 ){
             this.dmError("分類上書きエラー");
             return -1;
@@ -1713,7 +1718,8 @@ let MDMC = {
         doCalculate.reCalculate(-1);
     },
     dmPushCatTop : function(cat){
-        //onclick:全体分類ボタン
+        // onclick:全体分類ボタン
+        // 分類モードを変更し、現在追加されているターンの分類を上書きする
         const CATB_A = document.getElementById("dm_button_cat_a");
         const CATB_B = document.getElementById("dm_button_cat_b");
         const CATB_C = document.getElementById("dm_button_cat_c");
@@ -1756,7 +1762,8 @@ let MDMC = {
         doCalculate.sumEffortValue();
     },
     dmPushCat : function(cat){
-        //onclick:補正リスト中の分類ボタン選択時
+        // onclick:ターンの詳細設定画面中の分類ボタン選択時
+        // 参照中の技について分類を変更する
         if( openTurn == -1 ) return -1;
         let refTurn = dmTurns[openTurn];
         const CATB_A = document.getElementById("dm_button_RLcat_a");
@@ -1782,7 +1789,8 @@ let MDMC = {
         doCalculate.reCalculate(openTurn); //計算
     },
     dmPushRv : function(){
-        //onclick:分類判定ボタン
+        // onclick:分類反転ボタン
+        // 受け側の分類反転を受け付け、表示とデータを更新する
         if( openTurn == -1 ) return -1;
         let refTurn = dmTurns[openTurn];
         if( refTurn.cat[1] ){
@@ -1802,6 +1810,8 @@ let MDMC = {
         doCalculate.reCalculate(openTurn); //計算
     },
     dmPushNat : function(pn, isCD){
+        // onclick:性格変更ボタン
+        // 性格補正を切り替え、表示とデータを更新する
         let nat;
         if( isCD ) nat = +((pn==1)? inData.pokeCN:inData.pokeDN);
         else nat = +((pn==1)? inData.pokeAN:inData.pokeBN);
@@ -1819,7 +1829,8 @@ let MDMC = {
         doCalculate.reCalculate(-1); //計算
     },
     dmPushPM0 : function(idn, pm){
-        //技威力の上下
+        // onclick:技威力の上下ボタン
+        // 技の威力を5ずつ上下させる
         const textBox = document.getElementById("dm_in_"+idn+"_20");
         let refTurn = dmTurns[idn-10];
         let power = refTurn.pwr;
@@ -1833,7 +1844,8 @@ let MDMC = {
         doCalculate.reCalculate(idn-10); //計算
     },
     dmPushPM3 : function(idn, pm){
-        //ランクの上下
+        // onclick:ランクの上下ボタン
+        // 攻撃ランク・防御側ランク・急所ランクを1ずつ上下させる
         if( openTurn == -1 ) return -1;
         const textBox = document.getElementById("dm_in_3_" + idn);
         const revsBox = document.getElementById("MDMC_inrevs" + openTurn + "_r" + idn);
@@ -1877,7 +1889,8 @@ let MDMC = {
         doCalculate.reCalculate(openTurn); //計算
     },
     dmPushPM4 : function(turn, pm){
-        //弾数の設定
+        // onclick:弾数の設定ボタン
+        // 攻撃の連続回数を1ずつ上下させる
         const refTurn = (turn == -1)? openTurn: turn;
 
         let continueNum = dmTurns[refTurn].continuation;
@@ -1895,7 +1908,8 @@ let MDMC = {
         doCalculate.reCalculate(-1); //計算
     },
     dmPushPM : function(pn, idn, pm){
-        //onclick:数字上下
+        // onclick:実数値の上下ボタン
+        // 実数値を1ずつ上下させ、努力値についても更新を行う
         if( pn!=1 && pn!=2 ){
             MDMC.dmError("上下ボタン関数エラー");
             return -1;
@@ -1935,7 +1949,7 @@ let MDMC = {
         }
     },
     dmPushHPoptionOpen : function(){
-        //HPオプション開閉
+        // onclick:HPオプションの開閉ボタン
         if ( inData.HPoption.menuOpen ){
             // 開いている→ 閉じる
             inData.HPoption.menuOpen = false;
@@ -1949,7 +1963,8 @@ let MDMC = {
         }
     },
     dmPushHPoption : function(slip, slipId, reverceSlips = []){
-        //各種HPオプションボタン押下時
+        // onclick:各種HPオプションボタン押下時
+        // 定数ダメージに関するオプションを追加/削除する
         const slipElement = document.getElementById("MDMC_ho_box_"+slipId);
         if( slip.use ){
             // 適用している→ 外す
@@ -1975,7 +1990,7 @@ let MDMC = {
         doCalculate.reCalculate(-2, 0); //計算
     },
     dmPushSpecial : function(){
-        //HPを半分にする攻撃
+        // onclick:HPを半分にする攻撃を有効にするボタン
         const turn = openTurn;
         const guardHeight = document.getElementById("MDMC_RScrollWindow").scrollHeight;
         const guardElement = document.getElementById("MDMC_RLspecialGuard");
@@ -2001,7 +2016,8 @@ let MDMC = {
         doCalculate.reCalculate(turn);
     },
     dmPushYadorigi : function(slip, slipId){
-        //宿り木ボタン押下時
+        // onclick:宿り木ボタン押下時
+        // HPオプションの「宿り木の種」のオンオフを切り替え、吸収量の入力ボックスを表示する
         const enemyElement = document.getElementById("MDMC_hpOption_YadorigiEnemy");
         if( slip.use ){
             // 適用している→ 外す
@@ -2018,7 +2034,9 @@ let MDMC = {
         this.dmPushHPoption(slip, slipId);
     },
     dmPushStero : function(newIndex, slip, slipId){
-        //ステロボタン・まきびしボタン押下時
+        // onclick:ステロボタン・まきびしボタン押下時
+        // HPオプションのステルスロック・まきびしのオンオフを切り替える
+        // ダメージ候補から一つのみ選択済みにし、その他を未選択に制御する
         if ( newIndex == -1 || slip.index == newIndex ){
             // オフにする
             if ( slip.use ){
@@ -2047,7 +2065,8 @@ let MDMC = {
         doCalculate.reCalculate(-1, 0); //計算
     },
     dmChangeDm: function(tn){
-        //ダメージ表示の切り替え
+        // onclick:ダメージ表示の切り替え
+        // 通常のダメージ幅表示と乱数列表示を切り替える
         let isRand = dmTurnRandlist[tn];
         if( isRand ){
             //乱数→通常
@@ -2061,13 +2080,14 @@ let MDMC = {
             dmTurnRandlist[tn] = 1;
         }
     },
+    // 二種のポップアップメニューの開閉を記録する
     popupStatus: {
-        resultLog: false,
-        turnCard: false,
-        turn: 0
+        resultLog: false, // 詳細な計算結果を表示する
+        turnCard: false, // 各ターンの操作メニュー
+        turn: 0, // 現在開いている編集メニューのターン
     },
     closePopup: function(){
-        //ポップアップメニューを閉じる
+        // onclick:ポップアップメニューを閉じる
         document.getElementById("MDMC_closeTab").style.display = "none";
         if ( this.popupStatus.turnCard ){
             document.getElementById("MDMC_turnEdit" + this.popupStatus.turn).style.display = "none";
@@ -2078,13 +2098,13 @@ let MDMC = {
         }
     },
     openResultLog: function(){
-        //詳細結果を見る
+        // onclick:詳細結果のポップアップメニューを開く
         document.getElementById("MDMC_closeTab").style.display = "block";
         document.getElementById("MDMC_resultLog").style.display = "block";
         this.popupStatus.resultLog = true;
     },
     turncardEdit: function(turn){
-        //ターンのカードを操作する
+        // onclick:ターンのカードを操作する
         if (openTurn != -1) return -1;
         document.getElementById("MDMC_closeTab").style.display = "block";
         document.getElementById("MDMC_turnEdit" + turn).style.display = "flex";
@@ -2093,7 +2113,7 @@ let MDMC = {
         return 0;
     },
     resultMemo: function(){
-        //計算結果のコピー
+        // onclick:計算結果のメモを写し取る
         document.getElementById("MDMC_fixedResult1").style.display = "flex";
         document.getElementById("MDMC_FRber1").style.background = document.getElementById("MDMC_FRber0").style.background;
         document.getElementById("MDMC_FR1").innerText = document.getElementById("MDMC_FR0").innerText;
@@ -2101,54 +2121,51 @@ let MDMC = {
         document.getElementById("MDMC_FREF1b").innerText = document.getElementById("MDMC_FREF0b").innerText;
     },
     closeMemo: function(){
-        //計算結果メモを閉じる
+        // onclick:計算結果のメモを閉じる
         document.getElementById("MDMC_fixedResult1").style.display = "none";
     },
     requestData : async function(listId){
-        return new Promise((resolve, reject) => {
-        let reData = [];
-        //データリクエスト
-        let json = {
+        // ポケモンデータの取得
+        const json = {
             "modeAll" : +MDMC_MODEALL,
             "id" : +listId
         };
-        //resolve(["けつばん",90,90,85,125,90,100]); /*テスト用
-        let json_text = JSON.stringify(json);
+        const jsonData = JSON.stringify(json);
         //データを送信
-        xhr = new XMLHttpRequest;       //インスタンス作成
-        xhr.onload = function(){        //レスポンスを受け取った時の処理（非同期）
-            let res = xhr.responseText;
-            let data = JSON.parse(res);
-            let returnError = (data['id']==-1);
-            if(returnError){
-                reData = ["データ取得失敗",90,90,85,125,90,100];
+        try {
+            const response = await fetch("https://pokedesiaf.com/post-method/return-mdmc.php", {
+                method: "POST",
+                headers: {"Content-Type": 'application/json'},
+                body: jsonData
+            });
+            if ( !response.ok ){
+                // 異常レスポンス
+                throw new Error("レスポンス異常");
             }else{
-                if( MDMC.nowSelecting.pn == 1 ) inData.pokeAID = +data['id'];
-                else inData.pokeBID = +data['id'];
-                reData = [data['name'],  +data['base_h'], +data['base_a'], +data['base_b'],
-                        +data['base_c'], +data['base_d'], +data['base_s']];
+                // 正常レスポンス
+                const data = await response.json();
+                if ( data['id']==-1 ){
+                    // データベース側の検索エラー
+                    throw new Error("データベースエラー");
+                }else{
+                    // 正常完了
+                    if( MDMC.nowSelecting.pn == 1 ) inData.pokeAID = +data['id'];
+                    else inData.pokeBID = +data['id'];
+                    return [
+                        data['name'],
+                        +data['base_h'],
+                        +data['base_a'],
+                        +data['base_b'],
+                        +data['base_c'],
+                        +data['base_d'],
+                        +data['base_s']
+                    ];
+                }
             }
-            if(returnError) alert("データベースからのデータ取得に失敗しました");
-            resolve(reData);
-            reData = null;
-            res = null;
-            data = null;
-            json = null;
-            json_text = null;
-            returnError = null;
-            xhr = null;
-        };
-        xhr.onerror = function(){       //エラーが起きた時の処理（非同期）
-            reData = ["データ取得失敗",90,90,85,125,90,100];
-            resolve(reData);
-            reData = null;
-            json = null;
-            json_text = null;
-            xhr = null;
+        }catch ( error ) {
+            // 取得失敗データを返す
+            console.log(error);
+            return ["データ取得失敗",90,90,85,125,90,100];
         }
-        xhr.open('post', "https://pokedesiaf.com/post-method/return-mdmc.php", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(json_text);    //送信実行*/
-        });
     }
 }
