@@ -40,11 +40,11 @@ const MDMC_Turns = class{
 
 //const MDMC_POKEMAX = 1038 +1; //PHPで補完
 //const MDMC_MODEALL = 0; //PHPで補完
-const MDMC_RNUM = [6, 8, 12, 19, 20, 3, 9, 3, 5, 3, 4, 3, 12, 4, 5, 4];
+const MDMC_RNUM = [7, 10, 14, 20, 20, 4, 9, 3, 5, 3, 4, 3, 12, 4, 5, 4];
 
 const inData = {
     //攻側ポケモンデータ ポケモン名[0] id:#dm_in_1_0
-    pokeA : ["けつばん",55,90,80,50,105,96], // index対応：0->0, 9~14->1~6
+    pokeA : ["けつばん",55,90,80,50,105,96], // index対応：0:名前, 1~6:種族値
     pokeAID : -1,
     pokeAR : 142, //A実数値（id:#dm_in_1_2）
     pokeAI : 31, //A個体値（id:#dm_in_1_4）
@@ -54,7 +54,6 @@ const inData = {
     pokeCI : 31, //C個体値（id:#dm_in_1_9）
     pokeCE : 252, //C努力値（id:#dm_in_1_8）
     pokeCN : 1, //性格補正（0.9,1,1.1 / id:#dm_in_1_10)
-    //pokeAsubs : [31, 252, 1], //サブステータス：廃止
     //被弾側ポケモンデータ ポケモン名[0] id:#dm_in_2_0
     pokeB : ["けつばん",90,90,85,125,90,100],
     pokeBID : -1,
@@ -66,13 +65,10 @@ const inData = {
     pokeDI : 31, //C個体値（id:#dm_in_2_9）
     pokeDE : 0, //C努力値（id:#dm_in_2_8）
     pokeDN : 1, //性格補正（0.9,1,1.1 / id:#dm_in_2_10)
-    //pokeBsubs : [31, 0, 1], //サブステータス：廃止
     pokeBHR : 165, //H実数値（id:#dm_in_2_12）
     pokeBHI : 31, //H個体値（id:#dm_in_2_14）
     pokeBHE : 0, //H努力値（id:#dm_in_2_13）
-    //pokeBDMS : 0, //被弾側DMスイッチ（id:#dm_button_dm※）：廃止
-    //HPrejene : 0, //回復量（id:#dm_in_2_15）
-    //Stero : 0, //ステロダメージ（id:#dm_button_stero）
+    // 定数ダメージに関するデータ
     HPoption : {
         menuOpen: false, //メニューの開閉
         useNum: 0, //使用中のオプションの数
@@ -93,24 +89,11 @@ const inData = {
         Obon : {use: false, EATRATE:4, THRESHOLD:2, log:"オボン発動 回復"}, //オボン
         Berry : {use: false, EATRATE:3, THRESHOLD:4, log:"ピンチベリー発動 回復"}, //ピンチベリー
     },
-    //技データ
-    /*
-    moveContinue: {
-        used : 0, //使用スイッチ
-        turn : -1, //適用ターン
-        num : 1 //弾数（1-10）
-    }, //攻撃の弾数制御*/
-    //moveP : 90, //技威力（id:#dm_in_1_10）
-    //moveC : 0, //分類 0:物理/1:特殊（id:#dm_button_cat）
-    //moveRv : 0, //受け側の分類反転判定（id:dm_button_Rv）
-    //criticalRank : 0, //急所ランク（id:#dm_in_1_16）
+    //UI上で選択中の技の分類を記録する
     catMode : 0, //分類 0:物理/1:特殊/2:両面（id:#dm_button_cat）
     //レベルデータ
     levelA : 50, //レベル（id:#dm_in_1_1）
     levelB : 50, //レベル（id:#dm_in_2_1）
-    //ランクデータ：廃止
-    //rankA : 0, //ランク（id:#dm_in_1_6）
-    //rankB : 0, //ランク（id:#dm_in_2_6）
 }
 
 let dmTurns = [new MDMC_Turns(used=1), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns(), new MDMC_Turns()];
@@ -191,7 +174,6 @@ let Revices = {
 
 let ReList = {
     // 有効補正リストの操作
-    //List : [new MDMC_Nodes()], //：廃止、各ターンノードに帰属
     ListMAX : 7, //同時補正の最大数
     returnList : function(){
         //参照リストを返す
@@ -240,24 +222,25 @@ let ReList = {
         //タイプ系
         if( +ID == -1 ){
             //テラス適応力
-            Revices.isA[0] = 0;
-            Revices.isA[1] = 0;
-            document.getElementById("MDMC_Rbt_A00").style.background = "#ffffff";
-            document.getElementById("MDMC_Rbt_A01").style.background = "#ffffff";
-            this.deleteList("A00");
-            this.deleteList("A01");
-        }else if( +ID<=1 ){
+            for( let i=0; i<=2; i++ ){
+                Revices.isA[i] = 0;
+                document.getElementById("MDMC_Rbt_A0" + i).style.background = "#ffffff";
+                this.deleteList("A0" + i);
+            }
+        }else if( +ID<=2 ){
             //タイプ一致
-            const IDelse = "0" + (+ID^1);
-            Revices.isA[+IDelse] = 0;
+            for( let i=0; i<=2; i++ ){
+                if ( i == +ID ) continue;
+                Revices.isA[i] = 0;
+                document.getElementById("MDMC_Rbt_A0" + i).style.background = "#ffffff";
+                this.deleteList("A0" + i);
+            }
             Revices.isN[0] = 0;
-            document.getElementById("MDMC_Rbt_A" + IDelse).style.background = "#ffffff";
             document.getElementById("MDMC_Rbt_N00").style.background = "#ffffff";
-            this.deleteList("A"+IDelse);
             this.deleteList("N00");
         }else{
             //タイプ相性
-            for( let i=2; i<=5; i++ ){
+            for( let i=3; i<=6; i++ ){
                 if( i==+ID ) continue;
                 if( Revices.isA[i] ){
                     Revices.isA[i] = 0;
