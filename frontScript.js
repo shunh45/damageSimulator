@@ -267,19 +267,23 @@ const ReList = {
     }
 }
 
-let doCalculate = {
-    refList : [new MDMC_Nodes()], //：dmTurns[openTurn].RL
+// ダメージ計算を行い、結果を表示する
+const doCalculate = {
+    refList : [new MDMC_Nodes()],// 参照ターンのデータ（dmTurns[turn].RL）を保持する
     round : (x) => {
-        //x>0において五捨五超入処理となる
+        // x>0において五捨五超入処理となる
         return -1*Math.round(-1*x);
     },
     forRound : (dms, fn) => {
+        // 16通りの乱数ダメージ列に対してfnによる計算を実行する
         for (let i=0; i<16; i++){
             dms[i] = fn(+dms[i]);
         }
         return dms;
     },
     doReviceByFaze(faze){
+        // 補正タイミングに基づいて補正をかける
+        // 補正リストから現在の補正タイミングに合致している補正を探して、補正をかける
         let rev = 1;
         const ListEND = this.refList.length;
         for( let i=0; i<ListEND; i++ ){
@@ -292,6 +296,7 @@ let doCalculate = {
         return rev;
     },
     makeHPber : function(Max, Min, elementId = "MDMC_FRber0"){
+        // ダメージに基づいてHPバーを表示する
         const HPBElement = document.getElementById(elementId);
         const BerColor  = [["#f03535", "#e19b9b"], ["#f0bc12", "#f2e09d"], ["#78bb58", "#b5d9a4"]];
         const White = "#eee";
@@ -308,7 +313,7 @@ let doCalculate = {
             Grad += ", " + BerColor[0][0] + " " + Max + "%, " + BerColor[0][0] + " 100%";
             Grad += ")";
         }else if( Max > 80 ){
-            // 赤--赤 Max 赤R--赤R 80 黄R--黄R Min 白--白
+            // 赤--赤 Max 赤R--赤R 80% 黄R--黄R Min 白--白
             Grad += White + " " + Min + "%";
             Grad += ", " + BerColor[1][1] + " " + Min + "%, " + BerColor[1][1] + " 80%";
             Grad += ", " + BerColor[0][1] + " 80%, " + BerColor[0][1] + " " + Max + "%";
@@ -321,7 +326,7 @@ let doCalculate = {
             Grad += ", " + BerColor[1][0] + " " + Max + "%, " + BerColor[1][0] + " 100%";
             Grad += ")";
         }else if( Max > 50 ){
-            // 黄--黄 Max 黄R--黄R 50 緑R--緑R Min 白--白
+            // 黄--黄 Max 黄R--黄R 50% 緑R--緑R Min 白--白
             Grad += White + " " + Min + "%";
             Grad += ", " + BerColor[2][1] + " " + Min + "%, " + BerColor[2][1] + " 50%";
             Grad += ", " + BerColor[1][1] + " 50%, " + BerColor[1][1] + " " + Max + "%";
@@ -337,7 +342,7 @@ let doCalculate = {
         HPBElement.style.background = Grad;
     },
     calculate : function(tn){
-        //1ターンのダメージ計算
+        // 1ターンのダメージ計算を実行
         let refTurn = dmTurns[tn];
         this.refList = refTurn.RL;
         //変数宣言
@@ -411,6 +416,7 @@ let doCalculate = {
         damageC = Math.floor(damageC/50)+2;
         damage = Math.floor((damage*pwr*at)/df);
         damage = Math.floor(damage/50)+2;
+        //乱数分岐前ダメージ補正
         for ( let i=61; i<=64; i++ ){
             if ( (t = this.doReviceByFaze(i)) != 1 ){
                 damage = this.round(damage*t);
@@ -423,7 +429,7 @@ let doCalculate = {
             damages[i] = Math.floor(damage*(1-0.01*i));
             damagesC[i] = Math.floor(damageC*(1-0.01*i));
         }
-        //諸補正
+        //乱数分岐後ダメージ補正
         for ( let i=65; i<=67; i++ ){
             if ( (t = this.doReviceByFaze(i)) != 1 ){
                 damages = this.forRound(damages, function(x){
@@ -434,7 +440,7 @@ let doCalculate = {
                 });
             }
         }
-        //faze7:ダメージ値補正
+        //faze7:最終ダメージ値補正
         if ( (t = this.doReviceByFaze(70)) != 1 ){
             damages = this.forRound(damages, function(x){
                 return doCalculate.round(x*t);
@@ -458,7 +464,7 @@ let doCalculate = {
                 return doCalculate.round(x*t);
             });
         }
-        //ゼロ判定
+        //ゼロ判定（0ダメージを1ダメージにする）
         for( i=15; i>=0; i-- ){
             if( damages[i] > 0 ) break;
             damages[i] = 1;
@@ -469,25 +475,29 @@ let doCalculate = {
         }
         return [damages, damagesC];
     },
-    calculateTurn: function(tn, isReCal=1){
-        //ターンの計算
+    calculateTurn: function(tn, isReCal=true){
+        // 参照ターンについて、表示の更新を行う
+        // isReCal：ダメージの再計算が必要かどうかの判定フラグ
         let refTurn = dmTurns[tn];
         if( MDMC.setted.pokeA == 1 && MDMC.setted.pokeB == 1 ){
+            // ポケモンが攻防ともに入力済みの場合
             let damages = [];
             let damagesC = [];
             if( isReCal ){
+                // ダメージ計算の再実行
                 [damages, damagesC] = this.calculate(tn);
                 refTurn.damages = damages;
                 refTurn.damagesC = damagesC;
             }else{
+                // 表示のみ変更する場合
                 [damages, damagesC] = [refTurn.damages, refTurn.damagesC];
             }
-            //ターン表示
+            //ターンの結果表示
             let range = "▷ " + damages[0] + "～" + damages[15];
             const maxHp = inData.pokeBHR;
             range += " (" + (Math.round(1000*damages[0]/maxHp)/10) + "～" + (Math.round(1000*damages[15]/maxHp)/10) + "%)";
             document.getElementById("MDMC_ttrs"+tn).innerText = range;
-            //乱数
+            //乱数列の表示
             let randN = "乱数▷";
             let randC = "急所▷";
             for( let i=0; i<16; i++ ){
@@ -496,13 +506,14 @@ let doCalculate = {
             }
             document.getElementById("MDMC_ttrsR"+tn).innerText = randN + "\n" + randC;
         }else{
+            // ポケモンが未設定の場合
             document.getElementById("MDMC_ttrs"+tn).innerText = "▷ 0～0 (0～0%)";
             refTurn.damages = ZERO_DAMAGE;
             refTurn.damagesC = ZERO_DAMAGE;
         }
     },
     makeReList : function(node, write){
-        //ノードの内容を補正リストに表示
+        // 参照ターンについて、技の詳細と火力補正リストの内容をUIの補正リストに適用する
         const refTurn = dmTurns[node];
         const refList = refTurn.RL;
         const ElName = "MDMC_inrevs" + write;
@@ -568,8 +579,10 @@ let doCalculate = {
         }
     },
     plus : function(copyOrg=-1){
-        //onclick:入力内容を追加ボタン
+        // onclick:ターンを1追加する
+        // copyOrg：コピー時にコピー元のターンを渡す（コピーしない場合は-1）
         const tn = dmTurnNum;
+        // ターン数の追加上限判定
         if( tn >= TURN_MAX-1 ){
             if( tn == TURN_MAX ){
                 //登録上限
@@ -580,12 +593,12 @@ let doCalculate = {
                 document.getElementById("MDMC_ttLast").style.display = "none";
             }
         }
-        //ノード追加
+        // ターンの追加
         document.getElementById("MDMC_tt"+tn).style.display = "flex";
         document.getElementById("MDMC_ttResult"+tn).style.display = "flex";
         dmTurnNum += 1;
         if( copyOrg == -1 ){
-            //通常追加
+            // 通常追加
             dmTurns[tn] = new MDMC_Turns();
             dmTurns[tn].used = true;
             dmTurns[tn].cat = [((inData.catMode==1)? 1:0), false];
@@ -600,7 +613,7 @@ let doCalculate = {
             document.getElementById("MDMC_ttCR_N" + tn).style.display = "flex";
             document.getElementById("MDMC_ttCR_S" + tn).style.display = "none";
         }else{
-            //コピー追加
+            // コピー追加
             let ORG = dmTurns[copyOrg];
             dmTurns[tn] = new MDMC_Turns(1, ORG.damages.slice(), ORG.damagesC.slice(),
                 +ORG.pwr, ORG.cat.slice(), ORG.rank.slice(), +ORG.criticalRank, +ORG.continuation, +ORG.modeHalf, ReList.makeCopy(copyOrg));
@@ -644,13 +657,13 @@ let doCalculate = {
         return 1;
     },
     copy : function(org){
-        //onclick:コピーボタン
-        if (openTurn != -1) return -1;
+        // onclick:ターンのコピー
+        if (openTurn != -1) return -1; // ターンの編集画面を開いている間はコピーを行わない
         else return this.plus(org);
     },
     minus : function(t){
-        //onclick:ターンの消去
-        if (openTurn != -1) return -1;
+        // onclick:ターンの消去
+        if (openTurn != -1) return -1; // ターンの編集画面を開いている間は削除を行わない
         let preRandlist = dmTurnRandlist[t];
         for ( let i=t; i<dmTurnNum-1; i++ ){
             dmTurns[i] = dmTurns[i+1];
@@ -712,7 +725,7 @@ let doCalculate = {
         return 1;
     },
     sumEffortValue : function(){
-        // 努力値の表示
+        // 努力値の計算・表示
         let AEsum, BEsum;
         const catStatus = dmStatusRef;
         const cat = inData.catMode;
@@ -731,26 +744,33 @@ let doCalculate = {
         document.getElementById("MDMC_FREF0a").innerText = AEsum;
         document.getElementById("MDMC_FREF0b").innerText = BEsum;
     },
-    reCalculate : function(tn=-1, isReCal=1){
-        //結果の上書き
+    reCalculate : function(tn=-1, isReCal=true){
+        // 結果の上書き
+        // tn：
+        //  0~4：特定のターンのみ再計算 -> 表示の更新
+        //  -1：全ターンの再計算 -> 表示の更新
+        //  -2：表示の更新のみ
         if( tn == -1 ){
-            //全ターンの上書き
+            // 全ターンのダメージを再計算
             for( let i=0; i<dmTurnNum; i++ ){
                 this.calculateTurn(i, isReCal);
             }
         }else if( tn >= 0 ){
+            // 特定のターンのみダメージを再計算
             this.calculateTurn(tn, isReCal);
         }
         if( dmTurnNum != 0 ){
+            // 結果表示の更新
             this.makeResult();
         }else{
+            // ターンが一つもない場合の表示更新
             this.makeHPber(0, 0)
             document.getElementById("MDMC_FR0").innerText = "0～0（0～0%）0% / 0%";
         }
         this.sumEffortValue();
     },
     eatBerry : (HP, optionBerry) => {
-        //木のみを食べるかどうかの判定
+        // // makeResult関数内における木のみを食べるかどうかの判定木のみを食べるかどうかの判定
         const { use, threshold, healValue } = optionBerry;
         if ( use ){
             for ( i=1; i<=threshold; i++ ){
@@ -773,7 +793,7 @@ let doCalculate = {
         return HP;
     },
     takeSlip : (HP, change) => {
-        //定数ダメージ・回復の計算
+        // makeResult関数内における、定数ダメージ・回復の計算
         if ( change>0 ){
             const HPMAX = HP.n.length;
             HP.n = [HP.n[0]].concat(Array(change).fill(0), HP.n.slice(1, -change-1), [HP.n.slice(HPMAX-change-1).reduce((a, x) => a + x)]);
@@ -786,9 +806,9 @@ let doCalculate = {
         return HP;
     },
     makeResult : function(){
-        //瀕死率計算
-        let percent = {n: [], be: []};
-        let percentC = {n: [], be: []};
+        // 全ターンについて、ダメージ計算の結果から生存率を計算する
+        let percent = {n: [], be: []}; //HPをindexとして、そのHPになる確率を保存する配列（n:きのみを食べる前, be:木の実を食べた後）
+        let percentC = {n: [], be: []}; // 急所を考慮した確率
         let totalDamage = [0,0]; //暫定ダメージ
         let totalDamageP = [0,0]; //暫定割合ダメージ
         const plusTotalDamage = (damage, damage2=damage) => {
@@ -808,7 +828,7 @@ let doCalculate = {
             return -1;
         }
 
-        // 回復木の実の準備
+        // 回復木の実のデータ準備
         const optionBerry = {
             use : false,
             threshold : 0,
@@ -896,14 +916,14 @@ let doCalculate = {
 
         optionSlip.table.forEach( (d) => optionSlip.slipTotal += d );
 
-        // ステロダメージ
+        // ステロダメージの適用
         let steroDamage = 0;
         if( inData.HPoption.Stero.use ){
             const d = ~~( HPMAX / inData.HPoption.Stero.DAMAGE[inData.HPoption.Stero.index] );
             steroDamage += d;
             resultLog += "\n▷ ステロダメージ: " + d;
         }
-        // まきびしダメージ
+        // まきびしダメージの適用
         if( inData.HPoption.Makibishi.use ){
             const d = ~~( HPMAX / inData.HPoption.Makibishi.DAMAGE[inData.HPoption.Makibishi.index] );
             steroDamage += d;
@@ -1084,7 +1104,7 @@ let doCalculate = {
                 }
             }
 
-            //木の実発動判定
+            // 木の実発動判定
             if ( optionBerry.ateBerry == 1 ){
                 optionBerry.ateBerry = 2;
                 resultLog += optionBerry.log + ":" + optionBerry.healValue;
@@ -1142,15 +1162,15 @@ let doCalculate = {
         dead = Math.round(10*(percent.n[0] + percent.be[0]))/10;
         deadC = Math.round(10*(percentC.n[0] + percentC.be[0]))/10;
         //ログの表示
-        resultLog += "\n最終ターン終了時\n  " + ((resultDead)? HPMAX + " or " : "") + totalDamage[0] + "～" + totalDamage[1] + " / " + HPMAX + 
-            "（" + ((resultDead)? "100% or " : "") + totalDamageP[0] + "～" + totalDamageP[1] + "%）\n  瀕死率:" + dead + "%（実質瀕死率:" + deadC + "%）";
+        resultLog += "\n最終ターン終了時\n  " + ((resultDead)? "瀕死" + " or " : "") + totalDamage[0] + "～" + totalDamage[1] + " / " + HPMAX + 
+            "（" + ((resultDead)? "瀕死 or " : "") + totalDamageP[0] + "～" + totalDamageP[1] + "%）\n  瀕死率:" + dead + "%（実質瀕死率:" + deadC + "%）";
         document.getElementById("MDMC_resultLog").innerText = "計算結果\n" + printResult + resultLog;
         percent = null;
         percentC = null;
         return 1;
     },
     resetTurns : function(){
-        //ターンノードの全消去
+        // ターンノードの全消去
         const TURNMAX = this.turn;
         for( let i=0; i<TURNMAX; i++ ){
             this.Turns[i].used = false;
